@@ -1,0 +1,4 @@
+*.pyc
+.idea
+/files/input/dataset/*
+/files/output/*/*

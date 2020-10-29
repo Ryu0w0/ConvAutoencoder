@@ -1,0 +1,74 @@
+def initialization():
+    """
+    Initializing arguments, logger, tensorboard recorder and json files.
+    """
+    import argparse
+    from torch.utils.tensorboard import SummaryWriter
+    from utils import file_operator as f_op
+    from utils import logger as log_util
+    from utils import seed
+
+    # parameters
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-save_key", type=str, default="apgan",
+                        help="Used as a file name of dataset and log files")
+    parser.add_argument("-log_level", type=str, default="INFO")
+    # MODEL
+    parser.add_argument("-model_config_key", type=str, default="default")
+    # TRAINING
+    parser.add_argument("-batch_size", type=int, default=64)
+    parser.add_argument("-num_workers", type=int, default=1)
+    parser.add_argument("-use_gpu", type=int, default=0)
+    parser.add_argument("-is_reproducible", type=int, default=1)
+    # TARGET
+    parser.add_argument("-is_end2end", type=int, default=1,
+                        help="0 if training autoencoder and classifier separately otherwise 1")
+    args = parser.parse_args()
+
+    # create logger
+    args.log_level = log_util.get_log_level_from_name(args.log_level)
+    logger_ = log_util.create_logger("main", "./files/output/logs", args.save_key, args.log_level)
+    log_util.logger_ = logger_
+
+    # show specified arguments
+    logger_.info("*** ARGUMENTS ***")
+    for k, v in args.__dict__.items():
+        logger_.info(f"{k}: {v}")
+
+    # create TensorBoard writer
+    board_root_dir = f"./files/output/board/{args.save_key}"
+    f_op.create_folder(board_root_dir)
+    log_util.writer_ = SummaryWriter(board_root_dir)
+
+    # load model config
+    logger_.info("** LOAD MODEL CONFIG **")
+    # config = f_op.load_json("./files/input/models/configs", args.model_param_key)
+    # logger_.info(config)
+
+    # set flg of using seeds
+    if args.is_reproducible:
+        seed.feed_seed = True
+
+    return args
+
+
+def main():
+    args = initialization()
+    from utils.logger import logger_
+    from utils import file_operator as f_op
+    from utils.logger import logger_
+    from dataset.cifar10 import CIFAR10
+
+    logger_.info("*** CREATE DATASET ***")
+    trainset = CIFAR10(root='./files/input/dataset', train=True, download=True,
+                       reg_map={"bird": 2500, "truck": 2500, "deer": 2500})
+    testset = CIFAR10(root='./files/input/dataset', train=False, download=True)
+
+
+
+
+
+if __name__ == '__main__':
+    main()
+
+
