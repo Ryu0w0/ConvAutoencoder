@@ -1,7 +1,6 @@
 import numpy as np
 import torch
 import torch.nn.functional as F
-from torch import nn
 from utils import global_var as glb
 from torch.utils.data.dataloader import DataLoader
 from trainer.abstrainer import AbsTrainer
@@ -10,7 +9,6 @@ from trainer.abstrainer import AbsTrainer
 class TrainOnlyCNN(AbsTrainer):
     def __init__(self, cv_dataset, test_dataset, args, config, device):
         super().__init__(cv_dataset, test_dataset, args, config, device)
-        self.loss_f_cnn = nn.CrossEntropyLoss()
 
     def _train_epoch(self, cur_fold, cur_epoch, num_folds, model, optimizer, dataset, mode, es=None):
         loader = DataLoader(dataset, batch_size=self.args.batch_size, shuffle=True)

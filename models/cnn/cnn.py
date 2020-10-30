@@ -1,6 +1,6 @@
 from torch import nn, optim
 from utils.logger import logger_
-from utils import seed
+from utils.seed import seed_everything
 
 
 class CNN(nn.Module):
@@ -32,12 +32,12 @@ class CNN(nn.Module):
 
     def __initialize_weight(self):
         for idx, m in enumerate(self.modules()):
-            seed.seed_everything(local_seed=idx)
+            seed_everything(local_seed=idx)
             if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
                 nn.init.normal_(m.weight.data, 0.0, 0.02)
             elif isinstance(m, nn.BatchNorm2d):
                 nn.init.normal_(m.weight.data, 1.0, 0.02)
-                seed.seed_everything(local_seed=idx)
+                seed_everything(local_seed=idx)
                 nn.init.constant_(m.bias.data, 0)
 
     def get_optimizer(self):
