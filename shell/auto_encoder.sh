@@ -14,14 +14,14 @@ module load $1
 save_key="-save_key $2"
 log_level="-log_level INFO"
 use_gpu="-use_gpu 1"
-is_reproducible="-is_reproducible 0"
+is_reproducible="-is_reproducible 1"
 is_local="-is_local 0"
 # MODEL
 model_config_key="-model_config_key cae_cnn_lr1e-05"
 # TRAINING
 use_aug="-use_aug 0"
 num_folds="-num_folds 5"
-num_epoch="-num_epoch 50"
+num_epoch="-num_epoch 100"
 batch_size="-batch_size 64"
 num_workers="-num_workers 1"
 
