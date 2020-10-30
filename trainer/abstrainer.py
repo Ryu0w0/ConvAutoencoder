@@ -29,7 +29,7 @@ class AbsTrainer:
                                 tag_scalar_dict={f"fold{cur_fold}": stat},
                                 global_step=cur_epoch)
         logger_.info(f"[{cur_fold}/{self.args.num_folds}][{cur_epoch}/{self.args.num_epoch}] "
-                     f"Loss: {np.round(mean_loss, 4)}, ACC: {stats['accuracy']}")
+                     f"{mode} loss: {np.round(mean_loss, 4)}, {mode} acc: {stats['accuracy']}")
 
         # logging precision, recall and f1-score per class
         for cls_nm, stat in stats.items():
