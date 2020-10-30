@@ -5,11 +5,11 @@ from utils.multiple_optimizer import MultipleOptimizer
 
 
 class Classifier(nn.Module):
-    def __init__(self, config):
+    def __init__(self, config, device):
         super().__init__()
         self.config = config
-        self.conv_auto_en = ConvolutionalAutoEncoder(config) if self.config["use_cae"] else None
-        self.cnn = CNN(config).double()
+        self.conv_auto_en = ConvolutionalAutoEncoder(config).to(device) if self.config["use_cae"] else None
+        self.cnn = CNN(config).double().to(device)
 
     def get_optimizer(self):
         # create optimizer for autoencoder and cnn respectively as needed
