@@ -10,7 +10,7 @@ def initialization():
 
     # parameters
     parser = argparse.ArgumentParser()
-    parser.add_argument("-save_key", type=str, default="apgan",
+    parser.add_argument("-save_key", type=str, default="auto_en",
                         help="Used as a file name of dataset and log files")
     parser.add_argument("-log_level", type=str, default="INFO")
     parser.add_argument("-use_gpu", type=int, default=0)
@@ -25,9 +25,6 @@ def initialization():
     parser.add_argument("-num_epoch", type=int, default=5)
     parser.add_argument("-batch_size", type=int, default=128)
     parser.add_argument("-num_workers", type=int, default=1)
-    # TARGET
-    parser.add_argument("-is_end2end", type=int, default=1,
-                        help="0 if training autoencoder and classifier separately otherwise 1")
     args = parser.parse_args()
 
     # create logger

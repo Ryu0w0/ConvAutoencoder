@@ -1,5 +1,6 @@
 from torch import nn, optim
 from utils.logger import logger_
+from utils import seed
 
 
 class CNN(nn.Module):
@@ -20,10 +21,24 @@ class CNN(nn.Module):
             # 3rd block, output 4x4
             nn.Conv2d(in_channels=64, out_channels=128, kernel_size=3, stride=1, padding=1),
             nn.MaxPool2d(kernel_size=2, stride=2),
+            nn.BatchNorm2d(num_features=128),
+            nn.LeakyReLU(0.2),
             # classifying
             nn.Flatten(),
+            # nn.Dropout(),
             nn.Linear(in_features=4*4*128, out_features=10)
         )
+        self.__initialize_weight()
+
+    def __initialize_weight(self):
+        for idx, m in enumerate(self.modules()):
+            seed.seed_everything(local_seed=idx)
+            if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
+                nn.init.normal_(m.weight.data, 0.0, 0.02)
+            elif isinstance(m, nn.BatchNorm2d):
+                nn.init.normal_(m.weight.data, 1.0, 0.02)
+                seed.seed_everything(local_seed=idx)
+                nn.init.constant_(m.bias.data, 0)
 
     def get_optimizer(self):
         logger_.info("*** CNN OPTIMIZER ***")

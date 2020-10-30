@@ -26,16 +26,17 @@ class AbsTrainer:
         # logging overall loss and acc
         for stat_nm, stat in zip(["loss", "acc"], [mean_loss, stats["accuracy"]]):
             writer_.add_scalars(main_tag=f"{mode}/{stat_nm}",
-                                tag_scalar_dict={f"train_fold{cur_fold}": stat},
+                                tag_scalar_dict={f"fold{cur_fold}": stat},
                                 global_step=cur_epoch)
-        logger_.info(f"[{cur_fold}/{self.args.num_folds}][{cur_epoch}/{self.args.num_epoch}] Loss: {mean_loss}, ACC: {stats['accuracy']}")
+        logger_.info(f"[{cur_fold}/{self.args.num_folds}][{cur_epoch}/{self.args.num_epoch}] "
+                     f"Loss: {np.round(mean_loss, 4)}, ACC: {stats['accuracy']}")
 
         # logging precision, recall and f1-score per class
         for cls_nm, stat in stats.items():
             if cls_nm in self.cv_dataset.classes:
                 for stat_type in ["precision", "recall", "f1-score"]:
-                    writer_.add_scalars(main_tag=f"{mode}/{stat_type}",
-                                        tag_scalar_dict={f"train_fold{cur_fold}": stat[stat_type]},
+                    writer_.add_scalars(main_tag=f"{mode}_fold{cur_fold}/{stat_type}",
+                                        tag_scalar_dict={f"{cls_nm}": stat[stat_type]},
                                         global_step=cur_epoch)
 
     def cross_validation(self):
@@ -53,8 +54,8 @@ class AbsTrainer:
             # define early stopping
             es = EarlyStopping(min_delta=0.001, improve_range=5, score_type="acc")
 
-            # train
             for j in range(self.args.num_epoch):
+                # train
                 self.cv_dataset.set_train_transform()
                 self._train_epoch(cur_fold=i + 1,
                                   cur_epoch=j + 1,
@@ -63,7 +64,7 @@ class AbsTrainer:
                                   optimizer=optimizer,
                                   dataset=train,
                                   mode=glb.cv_train)
-            # validation
+                # validation
                 self.cv_dataset.set_valid_transform()
                 self._train_epoch(cur_fold=i + 1,
                                   cur_epoch=j + 1,

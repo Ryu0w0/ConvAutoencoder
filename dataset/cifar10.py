@@ -3,7 +3,7 @@ from torchvision.datasets import CIFAR10 as org_cifar10
 from torch.utils.data import Subset
 from sklearn.model_selection import StratifiedKFold
 from utils.logger import logger_
-from dataset.imgtransform import ImgTransform
+from dataset.img_transform import ImgTransform
 
 
 class CIFAR10(org_cifar10):

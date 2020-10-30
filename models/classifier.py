@@ -11,8 +11,6 @@ class Classifier(nn.Module):
         self.conv_auto_en = ConvolutionalAutoEncoder(config) if self.config["use_cae"] else None
         self.cnn = CNN(config).double()
 
-    # TODO: define initializer
-
     def get_optimizer(self):
         # create optimizer for autoencoder and cnn respectively as needed
         if self.config["use_cae"]:
