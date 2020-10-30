@@ -70,13 +70,10 @@ def main():
                        reg_map={"bird": 2500, "truck": 2500, "deer": 2500})
     testset = CIFAR10(root='./files/input/dataset', train=False, download=True, args=args)
 
-    logger_.info("*** CONSTRUCT WHOLE ARCHITECTURE ***")
-    model = Classifier(config, device).to(device)
-    logger_.info(model)
-
+    logger_.info("*** PREPARE TRAINING ***")
     trainer = TrainOnlyCNN(trainset, testset, args, config, device)
+    logger_.info("*** CROSS-VALIDATION ***")
     trainer.cross_validation()
-
 
     exit(0)
 

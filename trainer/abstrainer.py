@@ -42,14 +42,14 @@ class AbsTrainer:
     def cross_validation(self):
         for i in range(self.args.num_folds):
             # setup for one pattern of the n-fold cross-validation
-            logger_.info(f"** [{i + 1}/{self.args.num_folds}] CROSS-VALIDATION **")
+            logger_.info(f"** [{i + 1}/{self.args.num_folds}] {i + 1}-th CROSS-VALIDATION **")
             logger_.info(f"** [{i + 1}/{self.args.num_folds}] SETUP DATASET and MODEL **")
             # get train dataset consisting of n-1 folds
             train = self.cv_dataset.get_train_dataset(i)
             # get valid dataset consisting of 1 fold
             valid = self.cv_dataset.get_valid_dataset(i)
             # construct model and optimizer
-            model = Classifier(self.config)
+            model = Classifier(self.config).to(self.device)
             optimizer = model.get_optimizer()
             # define early stopping
             es = EarlyStopping(min_delta=0.001, improve_range=5, score_type="acc")
