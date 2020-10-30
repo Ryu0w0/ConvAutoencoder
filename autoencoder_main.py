@@ -15,6 +15,7 @@ def initialization():
     parser.add_argument("-log_level", type=str, default="INFO")
     parser.add_argument("-use_gpu", type=int, default=0)
     parser.add_argument("-is_reproducible", type=int, default=1)
+    parser.add_argument("-is_local", type=int, default=1)
     # MODEL
     parser.add_argument("-model_config_key", type=str, default="cae_cnn_default",
                         help="Name of config file specifying a model architecture.")
@@ -22,7 +23,7 @@ def initialization():
     parser.add_argument("-use_aug", type=int, default=1, help="1 if augment train data otherwise 0")
     parser.add_argument("-num_folds", type=int, default=5)
     parser.add_argument("-num_epoch", type=int, default=5)
-    parser.add_argument("-batch_size", type=int, default=64)
+    parser.add_argument("-batch_size", type=int, default=128)
     parser.add_argument("-num_workers", type=int, default=1)
     # TARGET
     parser.add_argument("-is_end2end", type=int, default=1,

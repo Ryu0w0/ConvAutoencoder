@@ -1,7 +1,9 @@
+import numpy as np
 import torch
 import torch.nn.functional as F
 from torch import nn
 from utils import global_var as glb
+from utils.logger import logger_
 from torch.utils.data.dataloader import DataLoader
 from trainer.abstrainer import AbsTrainer
 
@@ -11,15 +13,20 @@ class TrainOnlyCNN(AbsTrainer):
         super().__init__(cv_dataset, test_dataset, args, config, device)
         self.loss_f_cnn = nn.CrossEntropyLoss()
 
-    def _train_epoch(self, cur_fold, cur_epoch, num_folds, model, optimizer, dataset, mode):
+    def _train_epoch(self, cur_fold, cur_epoch, num_folds, model, optimizer, dataset, mode, es=None):
         loader = DataLoader(dataset, batch_size=self.args.batch_size, shuffle=True)
-
+        batch_num = len(loader)
+        total_loss = 0
+        preds = []
+        gt_labels = []
         if mode == glb.cv_train:
             model.train()
         else:
             model.eval()
 
         for id, batch in enumerate(loader):
+            logger_.info(f"[{cur_fold}/{self.args.num_folds}][{cur_epoch}/{self.args.num_epoch}]"
+                         f"[{id + 1}/{batch_num}] training...")
             images, labels = batch
             images, labels = images.to(self.device), labels.long().to(self.device)
             output = model(images)  # shape: (data_num, class_num)
@@ -29,3 +36,14 @@ class TrainOnlyCNN(AbsTrainer):
             loss.backward()
             optimizer.step()
 
+            # collect statistics
+            total_loss += loss.detach().cpu().item()
+            _, predicted = torch.max(output.detach().cpu(), 1)
+            preds.extend(predicted.tolist())
+            gt_labels.extend(labels.detach().cpu().tolist())
+
+        mean_loss, stats = self._calc_stat(total_loss, np.array(preds), np.array(gt_labels))
+        self._logging_stat(mode=mode, cur_fold=cur_fold, cur_epoch=cur_epoch,
+                           mean_loss=mean_loss, stats=stats)
+        if es is not None:
+            es.set_stop_flg(mean_loss, stats["accuracy"])

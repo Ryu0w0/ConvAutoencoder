@@ -1,3 +1,3 @@
 # cross-validation training mode
-cv_train = "Mass"
-cv_valid = "Others"
+cv_train = "train"
+cv_valid = "valid"

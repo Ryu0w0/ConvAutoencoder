@@ -4,7 +4,6 @@ from torch.utils.data import Subset
 from sklearn.model_selection import StratifiedKFold
 from utils.logger import logger_
 from dataset.imgtransform import ImgTransform
-from albumentations.pytorch import ToTensorV2
 
 
 class CIFAR10(org_cifar10):
@@ -50,7 +49,10 @@ class CIFAR10(org_cifar10):
         keep_idx = []
         for class_nm, class_no in self.class_to_idx.items():
             idx_array = np.where(class_no == np.array(self.targets))[0]
-            if class_nm in reg_map.keys():
+            if self.args.is_local == 1:
+                # regulate data of each class into 250 if running pgm at local while development
+                idx_array = np.random.choice(idx_array, 250, replace=False)
+            elif class_nm in reg_map.keys():
                 idx_array = np.random.choice(idx_array, reg_map[class_nm], replace=False)
             keep_idx.extend(list(idx_array))
 

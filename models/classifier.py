@@ -1,7 +1,7 @@
 from torch import nn
 from models.augoencoder.conv_auto_en import ConvolutionalAutoEncoder
 from models.cnn.cnn import CNN
-from utils.multiple_opt import MultipleOptimizer
+from utils.multiple_optimizer import MultipleOptimizer
 
 
 class Classifier(nn.Module):
@@ -11,7 +11,10 @@ class Classifier(nn.Module):
         self.conv_auto_en = ConvolutionalAutoEncoder(config) if self.config["use_cae"] else None
         self.cnn = CNN(config).double()
 
+    # TODO: define initializer
+
     def get_optimizer(self):
+        # create optimizer for autoencoder and cnn respectively as needed
         if self.config["use_cae"]:
             return MultipleOptimizer([self.conv_auto_en.get_optimizer(),
                                       self.cnn.get_optimizer()])
