@@ -71,7 +71,7 @@ def main():
     testset = CIFAR10(root='./files/input/dataset', train=False, download=True, args=args)
 
     logger_.info("*** CONSTRUCT WHOLE ARCHITECTURE ***")
-    model = Classifier(config)
+    model = Classifier(config).to(device)
     logger_.info(model)
 
     trainer = TrainOnlyCNN(trainset, testset, args, config, device)
