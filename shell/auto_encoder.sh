@@ -11,7 +11,7 @@
 module load $1
 
 # PARAMETERS
-save_key="-save_key auto_en_1030"
+save_key="-save_key $2"
 log_level="-log_level INFO"
 use_gpu="-use_gpu 1"
 is_reproducible="-is_reproducible 0"

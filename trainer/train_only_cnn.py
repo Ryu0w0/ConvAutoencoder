@@ -3,7 +3,6 @@ import torch
 import torch.nn.functional as F
 from torch import nn
 from utils import global_var as glb
-from utils.logger import logger_
 from torch.utils.data.dataloader import DataLoader
 from trainer.abstrainer import AbsTrainer
 
@@ -25,8 +24,6 @@ class TrainOnlyCNN(AbsTrainer):
             model.eval()
 
         for id, batch in enumerate(loader):
-            logger_.info(f"[{cur_fold}/{self.args.num_folds}][{cur_epoch}/{self.args.num_epoch}]"
-                         f"[{id + 1}/{batch_num}] training...")
             images, labels = batch
             images, labels = images.to(self.device), labels.long().to(self.device)
             output = model(images)  # shape: (data_num, class_num)
