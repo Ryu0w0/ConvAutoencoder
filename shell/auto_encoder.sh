@@ -23,6 +23,6 @@ use_aug="-use_aug 0"
 num_folds="-num_folds 5"
 num_epoch="-num_epoch 50"
 batch_size="-batch_size 64"
-num_workers="-num_workers 4"
+num_workers="-num_workers 1"
 
 python3 ./autoencoder_main.py $save_key $log_level $use_gpu $is_reproducible $is_local $model_config_key $use_aug $num_folds $num_epoch $batch_size $num_workers
