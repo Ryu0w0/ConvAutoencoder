@@ -1,0 +1,15 @@
+{
+  "use_cae": false,
+  "conv_auto_encoder": {
+
+  },
+  "cnn": {
+    "opt": {
+      "lr": 1e-06,
+      "betas": [
+        0.0,
+        0.999
+      ]
+    }
+  }
+}

@@ -1,17 +1,47 @@
-import random
 import numpy as np
 from torchvision.datasets import CIFAR10 as org_cifar10
+from torch.utils.data import Subset
+from sklearn.model_selection import StratifiedKFold
 from utils.logger import logger_
+from dataset.imgtransform import ImgTransform
+from albumentations.pytorch import ToTensorV2
 
 
 class CIFAR10(org_cifar10):
-    def __init__(self, root, train, download, reg_map=None):
+    def __init__(self, root, train, download, args, reg_map=None):
         super().__init__(root=root, train=train, download=download)
+        self.args = args
         if reg_map is not None:
-            self.regulate_data_num(reg_map)
-        self.show_data_composition()
+            self.__regulate_data_num(reg_map)
+        self.__show_data_composition()
+        self.train_idx_list, self.valid_idx_list = self.__get_idx_folds()
 
-    def regulate_data_num(self, reg_map):
+    def set_train_transform(self):
+        """ Set transform into dataset. Call it every epoch of training"""
+        self.transform = ImgTransform(args=self.args, is_train=True)
+        self.target_transform = None
+
+    def set_valid_transform(self):
+        """ Set transform into dataset. Call it every epoch of validating"""
+        self.transform = ImgTransform(args=self.args, is_train=False)
+        self.target_transform = None
+
+    def get_train_dataset(self, valid_fold_idx):
+        return Subset(self, self.train_idx_list[valid_fold_idx])
+
+    def get_valid_dataset(self, valid_fold_idx):
+        return Subset(self, self.valid_idx_list[valid_fold_idx])
+
+    def __get_idx_folds(self):
+        train_idx_list = []
+        valid_idx_list = []
+        skf = StratifiedKFold(n_splits=5, shuffle=True)
+        for train_idx, valid_idx in skf.split(self.data, self.targets):
+            train_idx_list.append(train_idx)
+            valid_idx_list.append(valid_idx)
+        return train_idx_list, valid_idx_list
+
+    def __regulate_data_num(self, reg_map):
         """
         Regulate the number of images.
         reg_map: dict
@@ -27,7 +57,7 @@ class CIFAR10(org_cifar10):
         self.targets = list(np.array(self.targets)[keep_idx])
         self.data = self.data[keep_idx, :, :, :]  # shape is (batch, w, h, ch)
 
-    def show_data_composition(self):
+    def __show_data_composition(self):
         dataset_type = "TRAIN" if self.train else "TEST"
         logger_.info(f"*** {dataset_type} DATA COMPOSITION ***")
         # show overall info

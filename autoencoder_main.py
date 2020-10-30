@@ -13,13 +13,17 @@ def initialization():
     parser.add_argument("-save_key", type=str, default="apgan",
                         help="Used as a file name of dataset and log files")
     parser.add_argument("-log_level", type=str, default="INFO")
-    # MODEL
-    parser.add_argument("-model_config_key", type=str, default="default")
-    # TRAINING
-    parser.add_argument("-batch_size", type=int, default=64)
-    parser.add_argument("-num_workers", type=int, default=1)
     parser.add_argument("-use_gpu", type=int, default=0)
     parser.add_argument("-is_reproducible", type=int, default=1)
+    # MODEL
+    parser.add_argument("-model_config_key", type=str, default="cae_cnn_default",
+                        help="Name of config file specifying a model architecture.")
+    # TRAINING
+    parser.add_argument("-use_aug", type=int, default=1, help="1 if augment train data otherwise 0")
+    parser.add_argument("-num_folds", type=int, default=5)
+    parser.add_argument("-num_epoch", type=int, default=5)
+    parser.add_argument("-batch_size", type=int, default=64)
+    parser.add_argument("-num_workers", type=int, default=1)
     # TARGET
     parser.add_argument("-is_end2end", type=int, default=1,
                         help="0 if training autoencoder and classifier separately otherwise 1")
@@ -42,29 +46,41 @@ def initialization():
 
     # load model config
     logger_.info("** LOAD MODEL CONFIG **")
-    # config = f_op.load_json("./files/input/models/configs", args.model_param_key)
-    # logger_.info(config)
+    config = f_op.load_json("./files/input/models/configs", args.model_config_key)
+    logger_.info(config)
 
     # set flg of using seeds
     if args.is_reproducible:
         seed.feed_seed = True
 
-    return args
+    return args, config
 
 
 def main():
-    args = initialization()
-    from utils.logger import logger_
-    from utils import file_operator as f_op
+    args, config = initialization()
     from utils.logger import logger_
     from dataset.cifar10 import CIFAR10
+    from models.classifier import Classifier
+    from trainer.train_only_cnn import TrainOnlyCNN
+
+    logger_.info("*** SET DEVICE ***")
+    device = "cpu" if args.use_gpu == 0 else "cuda"
+    logger_.info(f"Device is {device}")
 
     logger_.info("*** CREATE DATASET ***")
-    trainset = CIFAR10(root='./files/input/dataset', train=True, download=True,
+    trainset = CIFAR10(root='./files/input/dataset', train=True, download=True, args=args,
                        reg_map={"bird": 2500, "truck": 2500, "deer": 2500})
-    testset = CIFAR10(root='./files/input/dataset', train=False, download=True)
+    testset = CIFAR10(root='./files/input/dataset', train=False, download=True, args=args)
+
+    logger_.info("*** CONSTRUCT WHOLE ARCHITECTURE ***")
+    model = Classifier(config)
+    logger_.info(model)
+
+    trainer = TrainOnlyCNN(trainset, testset, args, config, device)
+    trainer.cross_validation()
 
 
+    exit(0)
 
 
 
