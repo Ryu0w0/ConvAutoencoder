@@ -38,6 +38,12 @@ class CIFAR10(org_cifar10):
         for train_idx, valid_idx in skf.split(self.data, self.targets):
             train_idx_list.append(train_idx)
             valid_idx_list.append(valid_idx)
+
+        # assertion whether train_idx includes valid idx
+        for t_idx, v_idx in zip(train_idx_list, valid_idx_list):
+            res = np.intersect1d(np.array(t_idx), np.array(v_idx))
+            assert len(res) == 0, f"Images are shared between train and valid dataset: {res}."
+
         return train_idx_list, valid_idx_list
 
     def __regulate_data_num(self, reg_map):

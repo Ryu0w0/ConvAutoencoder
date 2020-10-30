@@ -14,7 +14,6 @@ class TrainOnlyCNN(AbsTrainer):
 
     def _train_epoch(self, cur_fold, cur_epoch, num_folds, model, optimizer, dataset, mode, es=None):
         loader = DataLoader(dataset, batch_size=self.args.batch_size, shuffle=True)
-        batch_num = len(loader)
         total_loss = 0
         preds = []
         gt_labels = []
@@ -29,9 +28,10 @@ class TrainOnlyCNN(AbsTrainer):
             output = model(images)  # shape: (data_num, class_num)
             output = F.log_softmax(output, dim=1)
             loss = F.nll_loss(output, labels)
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
+            if mode == glb.cv_train:
+                optimizer.zero_grad()
+                loss.backward()
+                optimizer.step()
 
             # collect statistics
             total_loss += loss.detach().cpu().item()

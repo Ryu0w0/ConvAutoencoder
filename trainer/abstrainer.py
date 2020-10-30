@@ -1,4 +1,5 @@
 import numpy as np
+import torch
 from sklearn import metrics
 from utils.logger import logger_, writer_
 from utils import global_var as glb
@@ -66,14 +67,15 @@ class AbsTrainer:
                                   mode=glb.cv_train)
                 # validation
                 self.cv_dataset.set_valid_transform()
-                self._train_epoch(cur_fold=i + 1,
-                                  cur_epoch=j + 1,
-                                  num_folds=self.args.num_folds,
-                                  model=model,
-                                  optimizer=optimizer,
-                                  dataset=valid,
-                                  mode=glb.cv_valid,
-                                  es=es)
+                with torch.no_grad():
+                    self._train_epoch(cur_fold=i + 1,
+                                      cur_epoch=j + 1,
+                                      num_folds=self.args.num_folds,
+                                      model=model,
+                                      optimizer=optimizer,
+                                      dataset=valid,
+                                      mode=glb.cv_valid,
+                                      es=es)
                 if es.is_stop:
                     logger_.info("STOP BY EARLY STOPPING")
                     break
