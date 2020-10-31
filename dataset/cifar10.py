@@ -60,6 +60,9 @@ class CIFAR10(org_cifar10):
             if self.args.is_local == 1:
                 # regulate data of each class into 250 if running pgm at local while development
                 idx_array = np.random.choice(idx_array, 250, replace=False)
+            elif "all" in reg_map.keys():
+                seed_everything(target="random", local_seed=idx)
+                idx_array = np.random.choice(idx_array, reg_map["all"], replace=False)
             elif class_nm in reg_map.keys():
                 seed_everything(target="random", local_seed=idx)
                 idx_array = np.random.choice(idx_array, reg_map[class_nm], replace=False)
