@@ -54,6 +54,13 @@ class AbsTrainer:
             optimizer = model.get_optimizer()
             # define early stopping
             es = EarlyStopping(min_delta=0.001, improve_range=5, score_type="acc")
+            if i == 0:
+                logger_.info("*** MODEL ***")
+                logger_.info(model)
+                logger_.info("*** OPTIMIZER ***")
+                logger_.info(optimizer)
+                logger_.info("*** EARLY STOPPING ***")
+                logger_.info(es)
 
             for j in range(self.args.num_epoch):
                 # train
@@ -77,7 +84,7 @@ class AbsTrainer:
                                       mode=glb.cv_valid,
                                       es=es)
                 if es.is_stop:
-                    logger_.info("FINISH TRAINING DUE TO EARLY STOPPING")
+                    logger_.info("FINISH TRAINING BY EARLY STOPPING")
                     break
 
     def test(self, mode):

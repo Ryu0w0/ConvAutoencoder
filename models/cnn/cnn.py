@@ -41,12 +41,10 @@ class CNN(nn.Module):
                 nn.init.constant_(m.bias.data, 0)
 
     def get_optimizer(self):
-        logger_.info("*** CNN OPTIMIZER ***")
         lr = self.config["opt"]["lr"]
         beta1, beta2 = self.config["opt"]["betas"]
         optimizer = optim.Adam(params=filter(lambda p: p.requires_grad, self.parameters()), lr=lr,
                                betas=(beta1, beta2), eps=1e-8)
-        logger_.info(optimizer)
         return optimizer
 
     def forward(self, x):
