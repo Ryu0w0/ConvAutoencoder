@@ -11,18 +11,18 @@ class CNN(nn.Module):
             # 1st block, output 16x16
             nn.Conv2d(in_channels=3, out_channels=32, kernel_size=3, stride=1, padding=1),
             nn.MaxPool2d(kernel_size=2, stride=2),
-            nn.BatchNorm2d(num_features=32),
             nn.LeakyReLU(0.2),
+            nn.BatchNorm2d(num_features=32),
             # 2nd block, output 8x8
             nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, stride=1, padding=1),
             nn.MaxPool2d(kernel_size=2, stride=2),
-            nn.BatchNorm2d(num_features=64),
             nn.LeakyReLU(0.2),
+            nn.BatchNorm2d(num_features=64),
             # 3rd block, output 4x4
             nn.Conv2d(in_channels=64, out_channels=128, kernel_size=3, stride=1, padding=1),
             nn.MaxPool2d(kernel_size=2, stride=2),
-            nn.BatchNorm2d(num_features=128),
             nn.LeakyReLU(0.2),
+            nn.BatchNorm2d(num_features=128),
             # classifying
             nn.Flatten(),
             # nn.Dropout(),

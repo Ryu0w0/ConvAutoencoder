@@ -64,8 +64,7 @@ class AbsTrainer:
                                   model=model,
                                   optimizer=optimizer,
                                   dataset=train,
-                                  mode=glb.cv_train,
-                                  es=es)
+                                  mode=glb.cv_train)
                 # validation
                 self.cv_dataset.set_valid_transform()
                 with torch.no_grad():
@@ -75,7 +74,8 @@ class AbsTrainer:
                                       model=model,
                                       optimizer=optimizer,
                                       dataset=valid,
-                                      mode=glb.cv_valid)
+                                      mode=glb.cv_valid,
+                                      es=es)
                 if es.is_stop:
                     logger_.info("FINISH TRAINING DUE TO EARLY STOPPING")
                     break
