@@ -37,9 +37,9 @@ class TrainOnlyCNN(AbsTrainer):
             preds.extend(predicted.tolist())
             gt_labels.extend(labels.detach().cpu().tolist())
 
-        # if mode == glb.cv_valid:
-        mean_loss, stats = self._calc_stat(total_loss, np.array(preds), np.array(gt_labels))
-        self._logging_stat(mode=mode, cur_fold=cur_fold, cur_epoch=cur_epoch,
-                           mean_loss=mean_loss, stats=stats)
+        if mode == glb.cv_valid:
+            mean_loss, stats = self._calc_stat(total_loss, np.array(preds), np.array(gt_labels))
+            self._logging_stat(mode=mode, cur_fold=cur_fold, cur_epoch=cur_epoch,
+                               mean_loss=mean_loss, stats=stats)
         if es is not None:
             es.set_stop_flg(mean_loss, stats["accuracy"])
