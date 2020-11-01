@@ -26,9 +26,9 @@ class TrainOnlyCAE(AbsTrainer):
                 f_op.save_as_jpg(img_array * 255, save_root_path=save_image_path,
                                  save_key=self.args.save_key, file_name=f"{file_name}_{cur_fold}_{cur_epoch}")
 
-    def _train_epoch(self, cur_fold, cur_epoch, num_folds, model, optimizer, dataset, mode, es=None):
-
-        loader = DataLoader(dataset, batch_size=self.args.batch_size, shuffle=True)
+    @staticmethod
+    def train_epoch_cae(model, optimizer, dataset, mode, args, device):
+        loader = DataLoader(dataset, batch_size=args.batch_size, shuffle=True)
         total_loss = 0
         total_images = 0
 
@@ -40,7 +40,7 @@ class TrainOnlyCAE(AbsTrainer):
         # training iteration
         for id, batch in enumerate(loader):
             images, _ = batch
-            images = images.to(self.device)
+            images = images.to(device)
             output = model(images)
             loss = F.mse_loss(images, output)
             if mode == glb.cv_train:
@@ -51,7 +51,10 @@ class TrainOnlyCAE(AbsTrainer):
             # collect statistics
             total_images += len(images)
             total_loss += loss.detach().cpu().item()
+        return total_loss, total_images, images, output
 
+    def _train_epoch(self, cur_fold, cur_epoch, num_folds, model, optimizer, dataset, mode, es=None):
+        total_loss, total_images, images, output = self.train_epoch_cae(model, optimizer, dataset, mode, self.args, self.device)
         if mode == glb.cv_valid:
             # logging statistics
             mean_loss = total_loss / total_images
@@ -59,3 +62,36 @@ class TrainOnlyCAE(AbsTrainer):
             self.__save_image_as_grid(in_tensor=images, out_tensor=output, cur_fold=cur_fold, cur_epoch=cur_epoch)
             # record score for early stopping
             es.set_stop_flg(mean_loss)
+
+    # def _train_epoch(self, cur_fold, cur_epoch, num_folds, model, optimizer, dataset, mode, es=None):
+    #     loader = DataLoader(dataset, batch_size=self.args.batch_size, shuffle=True)
+    #     total_loss = 0
+    #     total_images = 0
+    #
+    #     if mode == glb.cv_train:
+    #         model.train()
+    #     else:
+    #         model.eval()
+    #
+    #     # training iteration
+    #     for id, batch in enumerate(loader):
+    #         images, _ = batch
+    #         images = images.to(self.device)
+    #         output = model(images)
+    #         loss = F.mse_loss(images, output)
+    #         if mode == glb.cv_train:
+    #             optimizer.zero_grad()
+    #             loss.backward()
+    #             optimizer.step()
+    #
+    #         # collect statistics
+    #         total_images += len(images)
+    #         total_loss += loss.detach().cpu().item()
+    #
+    #     if mode == glb.cv_valid:
+    #         # logging statistics
+    #         mean_loss = total_loss / total_images
+    #         self.stat_collector.logging_stat_cae(mode=mode, cur_fold=cur_fold, cur_epoch=cur_epoch, mean_loss=mean_loss)
+    #         self.__save_image_as_grid(in_tensor=images, out_tensor=output, cur_fold=cur_fold, cur_epoch=cur_epoch)
+    #         # record score for early stopping
+    #         es.set_stop_flg(mean_loss)
