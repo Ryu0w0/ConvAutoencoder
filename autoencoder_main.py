@@ -68,8 +68,8 @@ def main():
     logger_.info(f"Device is {device}")
 
     logger_.info("*** CREATE DATASET ***")
-    regulation_map = {"all": 2500}
-    # regulation_map = {"bird": 2500, "truck": 2500, "deer": 2500}
+    # regulation_map = {"all": 2500}
+    regulation_map = {"bird": 2500, "truck": 2500, "deer": 2500}
     trainset = CIFAR10(root='./files/input/dataset', train=True, download=True, args=args,
                        reg_map=regulation_map)
     testset = CIFAR10(root='./files/input/dataset', train=False, download=True, args=args)

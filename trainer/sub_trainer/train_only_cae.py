@@ -13,7 +13,7 @@ class TrainOnlyCAE(AbsTrainer):
         super().__init__(cv_dataset, test_dataset, args, config, device)
         self.stat_collector = StatCollector(self.cv_dataset.classes, args)
 
-    def __save_image_as_grid(self, in_tensor, out_tensor, cur_epoch):
+    def __save_image_as_grid(self, in_tensor, out_tensor, cur_fold, cur_epoch):
         if cur_epoch % self.args.save_img_per_epoch == 0:
             for img_tensor, file_name in zip([in_tensor, out_tensor], ["org", "reconstructed"]):
                 img_tensor = img_tensor.detach()
@@ -24,7 +24,7 @@ class TrainOnlyCAE(AbsTrainer):
                 img_array = vutils.make_grid(img_tensor, padding=2, normalize=False).cpu().numpy()
                 img_array = np.transpose(img_array, (1, 2, 0))
                 f_op.save_as_jpg(img_array * 255, save_root_path=save_image_path,
-                                 save_key=self.args.save_key, file_name=f"{cur_epoch}_{file_name}")
+                                 save_key=self.args.save_key, file_name=f"{file_name}_{cur_fold}_{cur_epoch}")
 
     def _train_epoch(self, cur_fold, cur_epoch, num_folds, model, optimizer, dataset, mode, es=None):
         # processing only training dataset
@@ -51,6 +51,6 @@ class TrainOnlyCAE(AbsTrainer):
             # logging statistics
             mean_loss = total_loss / total_images
             self.stat_collector.logging_stat_cae(mode=mode, cur_fold=cur_fold, cur_epoch=cur_epoch, mean_loss=mean_loss)
-            self.__save_image_as_grid(in_tensor=images, out_tensor=output, cur_epoch=cur_epoch)
+            self.__save_image_as_grid(in_tensor=images, out_tensor=output, cur_fold=cur_fold, cur_epoch=cur_epoch)
             # record score for early stopping
             es.set_stop_flg(mean_loss)
