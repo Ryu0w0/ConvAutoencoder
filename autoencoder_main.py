@@ -22,7 +22,7 @@ def initialization():
     # TRAINING
     parser.add_argument("-use_aug", type=int, default=1, help="1 if augment train data otherwise 0")
     parser.add_argument("-num_folds", type=int, default=5)
-    parser.add_argument("-num_epoch", type=int, default=5)
+    parser.add_argument("-num_epoch", type=int, default=10)
     parser.add_argument("-batch_size", type=int, default=128)
     parser.add_argument("-num_workers", type=int, default=1)
     parser.add_argument("-save_img_per_epoch", type=int, default=5,
@@ -60,6 +60,7 @@ def main():
     args, config = initialization()
     from utils.logger import logger_
     from dataset.cifar10 import CIFAR10
+    from trainer.sub_trainer.train_cae_cnn import TrainCAECNN
     from trainer.sub_trainer.train_only_cnn import TrainOnlyCNN
     from trainer.sub_trainer.train_only_cae import TrainOnlyCAE
 
@@ -75,10 +76,14 @@ def main():
     testset = CIFAR10(root='./files/input/dataset', train=False, download=True, args=args)
 
     logger_.info("*** PREPARE TRAINING ***")
-    if config["use_cnn"]:
+    if config["use_cae"] and config["use_cnn"]:
+        trainer = TrainCAECNN(trainset, testset, args, config, device)
+    elif config["use_cnn"]:
         trainer = TrainOnlyCNN(trainset, testset, args, config, device)
-    else:
+    elif config["use_cae"]:
         trainer = TrainOnlyCAE(trainset, testset, args, config, device)
+    else:
+        assert False, "At least one model should be specified."
     logger_.info("*** CROSS-VALIDATION ***")
     trainer.cross_validation()
 

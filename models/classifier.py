@@ -14,8 +14,7 @@ class Classifier(nn.Module):
     def get_optimizer(self):
         # create optimizer for autoencoder and cnn respectively as needed
         if self.config["use_cae"] and self.config["use_cnn"]:
-            return MultipleOptimizer([self.cae.get_optimizer(),
-                                      self.cnn.get_optimizer()])
+            return MultipleOptimizer(opt_cae=self.cae.get_optimizer(), opt_cnn=self.cnn.get_optimizer())
         elif self.config["use_cnn"]:
             return self.cnn.get_optimizer()
         elif self.config["use_cae"]:
