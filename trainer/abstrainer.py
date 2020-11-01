@@ -1,4 +1,5 @@
 import numpy as np
+import torch
 from sklearn import metrics
 from utils.logger import logger_, writer_
 from utils import global_var as glb
@@ -29,7 +30,7 @@ class AbsTrainer:
                                 tag_scalar_dict={f"fold{cur_fold}": stat},
                                 global_step=cur_epoch)
         logger_.info(f"[{cur_fold}/{self.args.num_folds}][{cur_epoch}/{self.args.num_epoch}] "
-                     f"Loss: {np.round(mean_loss, 4)}, ACC: {stats['accuracy']}")
+                     f"{mode} loss: {np.round(mean_loss, 4)}, {mode} acc: {np.round(stats['accuracy'], 4)}")
 
         # logging precision, recall and f1-score per class
         for cls_nm, stat in stats.items():
@@ -42,17 +43,24 @@ class AbsTrainer:
     def cross_validation(self):
         for i in range(self.args.num_folds):
             # setup for one pattern of the n-fold cross-validation
-            logger_.info(f"** [{i + 1}/{self.args.num_folds}] CROSS-VALIDATION **")
+            logger_.info(f"** [{i + 1}/{self.args.num_folds}] {i + 1}-th CROSS-VALIDATION **")
             logger_.info(f"** [{i + 1}/{self.args.num_folds}] SETUP DATASET and MODEL **")
             # get train dataset consisting of n-1 folds
             train = self.cv_dataset.get_train_dataset(i)
             # get valid dataset consisting of 1 fold
             valid = self.cv_dataset.get_valid_dataset(i)
             # construct model and optimizer
-            model = Classifier(self.config)
+            model = Classifier(self.config).to(self.device)
             optimizer = model.get_optimizer()
             # define early stopping
             es = EarlyStopping(min_delta=0.001, improve_range=5, score_type="acc")
+            if i == 0:
+                logger_.info("*** MODEL ***")
+                logger_.info(model)
+                logger_.info("*** OPTIMIZER ***")
+                logger_.info(optimizer)
+                logger_.info("*** EARLY STOPPING ***")
+                logger_.info(es)
 
             for j in range(self.args.num_epoch):
                 # train
@@ -66,16 +74,17 @@ class AbsTrainer:
                                   mode=glb.cv_train)
                 # validation
                 self.cv_dataset.set_valid_transform()
-                self._train_epoch(cur_fold=i + 1,
-                                  cur_epoch=j + 1,
-                                  num_folds=self.args.num_folds,
-                                  model=model,
-                                  optimizer=optimizer,
-                                  dataset=valid,
-                                  mode=glb.cv_valid,
-                                  es=es)
+                with torch.no_grad():
+                    self._train_epoch(cur_fold=i + 1,
+                                      cur_epoch=j + 1,
+                                      num_folds=self.args.num_folds,
+                                      model=model,
+                                      optimizer=optimizer,
+                                      dataset=valid,
+                                      mode=glb.cv_valid,
+                                      es=es)
                 if es.is_stop:
-                    logger_.info("STOP BY EARLY STOPPING")
+                    logger_.info("FINISH TRAINING BY EARLY STOPPING")
                     break
 
     def test(self, mode):
