@@ -38,7 +38,7 @@ class AbsTrainer:
             model = Classifier(self.config).to(self.device)
             optimizer = model.get_optimizer()
             # define early stopping
-            es = EarlyStopping(min_delta=0.001, improve_range=5, score_type="acc")
+            es = EarlyStopping(min_delta=0.0001, improve_range=5, score_type="loss")
             self.__logging_materials_one_time(i, {"MODEL": model, "OPTIMIZER": optimizer, "EARLY STOPPING": es})
 
             for j in range(self.args.num_epoch):
@@ -50,7 +50,8 @@ class AbsTrainer:
                                   model=model,
                                   optimizer=optimizer,
                                   dataset=train,
-                                  mode=glb.cv_train)
+                                  mode=glb.cv_train,
+                                  es=es)
                 # validation
                 self.cv_dataset.set_valid_transform()
                 with torch.no_grad():

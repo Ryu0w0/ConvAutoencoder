@@ -1,4 +1,5 @@
 {
+  "use_cnn": true,
   "use_cae": false,
   "conv_auto_encoder": {
 

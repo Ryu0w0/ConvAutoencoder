@@ -1,0 +1,22 @@
+{
+  "use_cnn": false,
+  "use_cae": true,
+  "cnn": {
+    "opt": {
+      "lr": 1e-05,
+      "betas": [
+        0.0,
+        0.999
+      ]
+    }
+  },
+  "cae": {
+    "opt": {
+      "lr": 1e-05,
+      "betas": [
+        0.0,
+        0.999
+      ]
+    }
+  }
+}

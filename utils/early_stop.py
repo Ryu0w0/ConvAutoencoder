@@ -35,7 +35,7 @@ class EarlyStopping:
         else:
             return base < np.max(comp_values)
 
-    def set_stop_flg(self, loss, acc):
+    def set_stop_flg(self, loss=0, acc=0):
         score = self.__get_score(loss, acc)
         self.hist_scores.append(score)
 
