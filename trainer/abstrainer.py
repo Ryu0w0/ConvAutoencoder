@@ -15,30 +15,15 @@ class AbsTrainer:
         self.config = config
         self.device = device
 
+    @staticmethod
+    def __logging_materials_one_time(fold_seq, target_map):
+        if fold_seq == 0:
+            for name, material in target_map.items():
+                logger_.info(f"*** {name} ***")
+                logger_.info(material)
+
     def _train_epoch(self, cur_fold, cur_epoch, num_folds, model, optimizer, dataset, mode, es=None):
         pass
-
-    def _calc_stat(self, total_loss, preds, labels):
-        mean_loss = total_loss / len(preds)
-        stats = metrics.classification_report(labels, preds, target_names=self.cv_dataset.classes, output_dict=True)
-        return mean_loss, stats
-
-    def _logging_stat(self, mode, cur_epoch, cur_fold, stats, mean_loss):
-        # logging overall loss and acc
-        for stat_nm, stat in zip(["loss", "acc"], [mean_loss, stats["accuracy"]]):
-            writer_.add_scalars(main_tag=f"{mode}/{stat_nm}",
-                                tag_scalar_dict={f"fold{cur_fold}": stat},
-                                global_step=cur_epoch)
-        logger_.info(f"[{cur_fold}/{self.args.num_folds}][{cur_epoch}/{self.args.num_epoch}] "
-                     f"{mode} loss: {np.round(mean_loss, 4)}, {mode} acc: {np.round(stats['accuracy'], 4)}")
-
-        # logging precision, recall and f1-score per class
-        for cls_nm, stat in stats.items():
-            if cls_nm in self.cv_dataset.classes:
-                for stat_type in ["precision", "recall", "f1-score"]:
-                    writer_.add_scalars(main_tag=f"{mode}_fold{cur_fold}/{stat_type}",
-                                        tag_scalar_dict={f"{cls_nm}": stat[stat_type]},
-                                        global_step=cur_epoch)
 
     def cross_validation(self):
         for i in range(self.args.num_folds):
@@ -54,13 +39,7 @@ class AbsTrainer:
             optimizer = model.get_optimizer()
             # define early stopping
             es = EarlyStopping(min_delta=0.001, improve_range=5, score_type="acc")
-            if i == 0:
-                logger_.info("*** MODEL ***")
-                logger_.info(model)
-                logger_.info("*** OPTIMIZER ***")
-                logger_.info(optimizer)
-                logger_.info("*** EARLY STOPPING ***")
-                logger_.info(es)
+            self.__logging_materials_one_time(i, {"MODEL": model, "OPTIMIZER": optimizer, "EARLY STOPPING": es})
 
             for j in range(self.args.num_epoch):
                 # train

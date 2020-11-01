@@ -4,11 +4,13 @@ import torch.nn.functional as F
 from utils import global_var as glb
 from torch.utils.data.dataloader import DataLoader
 from trainer.abstrainer import AbsTrainer
+from trainer.stat_collector import StatCollector
 
 
 class TrainOnlyCNN(AbsTrainer):
     def __init__(self, cv_dataset, test_dataset, args, config, device):
         super().__init__(cv_dataset, test_dataset, args, config, device)
+        self.stat_collector = StatCollector(self.cv_dataset.classes, args)
 
     def _train_epoch(self, cur_fold, cur_epoch, num_folds, model, optimizer, dataset, mode, es=None):
         loader = DataLoader(dataset, batch_size=self.args.batch_size, shuffle=True)
@@ -20,6 +22,7 @@ class TrainOnlyCNN(AbsTrainer):
         else:
             model.eval()
 
+        # training iteration
         for id, batch in enumerate(loader):
             images, labels = batch
             images, labels = images.to(self.device), labels.long().to(self.device)
@@ -38,8 +41,9 @@ class TrainOnlyCNN(AbsTrainer):
             gt_labels.extend(labels.detach().cpu().tolist())
 
         if mode == glb.cv_valid:
-            mean_loss, stats = self._calc_stat(total_loss, np.array(preds), np.array(gt_labels))
-            self._logging_stat(mode=mode, cur_fold=cur_fold, cur_epoch=cur_epoch,
-                               mean_loss=mean_loss, stats=stats)
-        if es is not None:
+            # logging statistics
+            mean_loss, stats = self.stat_collector.calc_stat_cnn(total_loss, np.array(preds), np.array(gt_labels))
+            self.stat_collector.logging_stat_cnn(mode=mode, cur_fold=cur_fold, cur_epoch=cur_epoch,
+                                                 mean_loss=mean_loss, stats=stats)
+            # record score for early stopping
             es.set_stop_flg(mean_loss, stats["accuracy"])
