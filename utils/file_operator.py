@@ -1,6 +1,7 @@
 import os
 import pickle
 import json
+import cv2
 
 
 def create_folder(full_path):
@@ -16,6 +17,13 @@ def save_target_as_pickle(target, save_root_path, save_key):
     create_folder(save_root_path)
     with open(f"{save_root_path}/{save_key}.pickle", "wb") as f:
         pickle.dump(target, f)
+
+
+def save_as_jpg(img_array, save_key, save_root_path, file_name):
+    """ img_array should be [0, 255] """
+    target_dir = f"{save_root_path}/{save_key}"
+    create_folder(target_dir)
+    cv2.imwrite(target_dir+f"/{file_name}.jpg", img_array)
 
 
 def load_pickle(load_root_path, load_key):

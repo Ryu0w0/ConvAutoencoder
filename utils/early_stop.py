@@ -1,9 +1,12 @@
 import numpy as np
+from utils import global_var as glb
 
 
 class EarlyStopping:
     def __init__(self, min_delta, improve_range, score_type):
         """
+        :param target: glb.cv_train or glb.cv_valid
+            Choose which score is used in early stopping, either train or valid
         :param min_delta: float
             Minimum required improvement during improve_range
         :param improve_range: int
@@ -32,7 +35,7 @@ class EarlyStopping:
         else:
             return base < np.max(comp_values)
 
-    def set_stop_flg(self, loss, acc):
+    def set_stop_flg(self, loss=0, acc=0):
         score = self.__get_score(loss, acc)
         self.hist_scores.append(score)
 

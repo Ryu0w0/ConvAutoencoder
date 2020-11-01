@@ -3,6 +3,7 @@ from torch import nn, optim
 
 class ConvolutionalAutoEncoder(nn.Module):
     def __init__(self, config):
+        self.config = config["cae"]
         super().__init__()
         self.encoder = nn.Sequential(
             # 1st block, 32x32 to 16x16
@@ -19,13 +20,16 @@ class ConvolutionalAutoEncoder(nn.Module):
         self.decoder = nn.Sequential(
             # 1st block, 8x8 to 16x16
             nn.ConvTranspose2d(in_channels=64, out_channels=32, kernel_size=4, stride=2, padding=1),
-            nn.BatchNorm2d(num_features=64),
+            nn.BatchNorm2d(num_features=32),
             nn.LeakyReLU(0.2),
             # 2nd block, 16x16 to 32x32
             nn.ConvTranspose2d(in_channels=32, out_channels=3, kernel_size=4, stride=2, padding=1),
             nn.BatchNorm2d(num_features=3),
             nn.LeakyReLU(0.2)
         )
+
+    def visualize_images(self, img_tensor):
+        pass
 
     def get_optimizer(self):
         lr = self.config["opt"]["lr"]
