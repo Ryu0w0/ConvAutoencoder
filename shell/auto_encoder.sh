@@ -11,13 +11,13 @@
 module load $1
 
 # PARAMETERS
-save_key="-save_key $2"
+save_key="-save_key $3"
 log_level="-log_level INFO"
 use_gpu="-use_gpu 1"
 is_reproducible="-is_reproducible 1"
 is_local="-is_local 0"
 # MODEL
-model_config_key="-model_config_key cae_lr1e-05"
+model_config_key="-model_config_key $2"
 # TRAINING
 use_aug="-use_aug 0"
 num_folds="-num_folds 5"
