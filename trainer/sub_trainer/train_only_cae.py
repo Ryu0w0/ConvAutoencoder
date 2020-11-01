@@ -27,27 +27,32 @@ class TrainOnlyCAE(AbsTrainer):
                                  save_key=self.args.save_key, file_name=f"{file_name}_{cur_fold}_{cur_epoch}")
 
     def _train_epoch(self, cur_fold, cur_epoch, num_folds, model, optimizer, dataset, mode, es=None):
-        # processing only training dataset
-        if mode == glb.cv_train:
-            loader = DataLoader(dataset, batch_size=self.args.batch_size, shuffle=True)
-            total_loss = 0
-            total_images = 0
-            model.train()
 
-            # training iteration
-            for id, batch in enumerate(loader):
-                images, _ = batch
-                images = images.to(self.device)
-                output = model(images)
-                loss = F.mse_loss(images, output)
+        loader = DataLoader(dataset, batch_size=self.args.batch_size, shuffle=True)
+        total_loss = 0
+        total_images = 0
+
+        if mode == glb.cv_train:
+            model.train()
+        else:
+            model.eval()
+
+        # training iteration
+        for id, batch in enumerate(loader):
+            images, _ = batch
+            images = images.to(self.device)
+            output = model(images)
+            loss = F.mse_loss(images, output)
+            if mode == glb.cv_train:
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
 
-                # collect statistics
-                total_images += len(images)
-                total_loss += loss.detach().cpu().item()
+            # collect statistics
+            total_images += len(images)
+            total_loss += loss.detach().cpu().item()
 
+        if mode == glb.cv_valid:
             # logging statistics
             mean_loss = total_loss / total_images
             self.stat_collector.logging_stat_cae(mode=mode, cur_fold=cur_fold, cur_epoch=cur_epoch, mean_loss=mean_loss)
