@@ -5,28 +5,23 @@ class ConvolutionalAutoEncoder(nn.Module):
     def __init__(self, config):
         self.config = config["cae"]
         super().__init__()
-        self.encoder = nn.Sequential(
-            # 1st block, 32x32 to 16x16
-            nn.Conv2d(in_channels=3, out_channels=32, kernel_size=3, stride=1, padding=1),
-            nn.MaxPool2d(kernel_size=2, stride=2),
-            nn.LeakyReLU(0.2),
-            nn.BatchNorm2d(num_features=32),
-            # # HIDDEN, 16x16 to 8x8
-            # nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, stride=1, padding=1),
-            # nn.MaxPool2d(kernel_size=2, stride=2),
-            # nn.LeakyReLU(0.2),
-            # nn.BatchNorm2d(num_features=64)
-        )
-        self.decoder = nn.Sequential(
-            # # 1st block, 8x8 to 16x16
-            # nn.ConvTranspose2d(in_channels=64, out_channels=32, kernel_size=4, stride=2, padding=1),
-            # nn.BatchNorm2d(num_features=32),
-            # nn.LeakyReLU(0.2),
-            # 2nd block, 16x16 to 32x32
-            nn.ConvTranspose2d(in_channels=32, out_channels=3, kernel_size=4, stride=2, padding=1),
-            nn.BatchNorm2d(num_features=3),
-            nn.LeakyReLU(0.2)
-        )
+        enc_components = []
+        dec_components = []
+        for from_, to_ in self.config["enc_block_sizes"]:
+            enc_components.extend([
+                nn.Conv2d(in_channels=from_, out_channels=to_, kernel_size=3, stride=1, padding=1),
+                nn.MaxPool2d(kernel_size=2, stride=2),
+                nn.LeakyReLU(0.2),
+                nn.BatchNorm2d(num_features=to_),
+            ])
+        self.encoder = nn.Sequential(*enc_components)
+        for from_, to_ in self.config["dec_block_sizes"]:
+            dec_components.extend([
+                nn.ConvTranspose2d(in_channels=from_, out_channels=to_, kernel_size=4, stride=2, padding=1),
+                nn.BatchNorm2d(num_features=to_),
+                nn.LeakyReLU(0.2)
+            ])
+        self.decoder = nn.Sequential(*dec_components)
 
     def get_optimizer(self):
         lr = self.config["opt"]["lr"]
