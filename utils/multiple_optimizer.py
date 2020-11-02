@@ -4,7 +4,7 @@ class MultipleOptimizer(object):
         self.opt_cnn = opt_cnn
 
     def __str__(self):
-        return [opt.__str__() for opt in [self.opt_cae, self.opt_cnn]]
+        return " ".join([opt.__str__() for opt in [self.opt_cae, self.opt_cnn]])
 
     def zero_grad(self):
         self.opt_cae.zero_grad()

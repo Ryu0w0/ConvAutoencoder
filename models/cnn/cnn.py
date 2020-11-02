@@ -14,15 +14,19 @@ class CNN(nn.Module):
         components = []
         # feature extractor
         for from_, to_ in self.config["block_sizes"]:
-            components.extend([
-                nn.Conv2d(in_channels=from_, out_channels=to_, kernel_size=3, stride=1, padding=1),
-                nn.MaxPool2d(kernel_size=2, stride=2),
-                nn.LeakyReLU(0.2),
-                nn.BatchNorm2d(num_features=to_),
-            ])
+            if from_ == to_:
+                components.append(nn.Conv2d(in_channels=from_, out_channels=to_, kernel_size=3, stride=1, padding=1))
+            else:
+                components.extend([
+                    nn.Conv2d(in_channels=from_, out_channels=to_, kernel_size=3, stride=1, padding=1),
+                    nn.MaxPool2d(kernel_size=2, stride=2),
+                    nn.LeakyReLU(0.2),
+                    nn.BatchNorm2d(num_features=to_),
+                ])
         # classifying
         components.append(nn.Flatten())
-        last_resolution = int((input_resolution / (2 ** len(self.config["block_sizes"]))))
+        num_pooling = len([comp for comp in components if isinstance(comp, nn.MaxPool2d)])
+        last_resolution = int((input_resolution / (2 ** num_pooling)))
         last_depth = self.config["block_sizes"][-1][-1]
         components.append(nn.Linear(in_features=last_depth * last_resolution ** 2, out_features=num_class))
         return components
