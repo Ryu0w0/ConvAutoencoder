@@ -77,6 +77,8 @@ class AbsTrainer:
                                       es=es)
                 if es.is_stop:
                     logger_.info("FINISH TRAINING BY EARLY STOPPING")
+                    logger_.info("EARLY STOP INFO")
+                    logger_.info(es)
                     break
 
     def test(self, mode):

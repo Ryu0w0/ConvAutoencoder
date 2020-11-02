@@ -24,7 +24,8 @@ class EarlyStopping:
         self.is_stop = False
 
     def __str__(self):
-        return f"min_delta: {self.min_delta}, improve_range: {self.improve_range}, score_type: {self.score_type}"
+        return f"min_delta: {self.min_delta}, improve_range: {self.improve_range}, " \
+               f"score_type: {self.score_type}, hist: {self.hist_scores}"
 
     def __get_score(self, loss, acc):
         return loss if self.score_type == "loss" else acc
