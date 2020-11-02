@@ -3,6 +3,7 @@ import torch.nn.functional as F
 from torch.utils.data.dataloader import DataLoader
 from torchvision import utils as vutils
 from utils import global_var as glb
+from utils.early_stop import EarlyStopping
 from utils import file_operator as f_op
 from trainer.abstrainer import AbsTrainer
 from trainer.stat_collector import StatCollector
@@ -12,6 +13,10 @@ class TrainOnlyCAE(AbsTrainer):
     def __init__(self, cv_dataset, test_dataset, args, config, device):
         super().__init__(cv_dataset, test_dataset, args, config, device)
         self.stat_collector = StatCollector(self.cv_dataset.classes, args)
+
+    @staticmethod
+    def _get_early_stopping():
+        return EarlyStopping(min_delta=0.00001, improve_range=5, score_type="loss")
 
     def __save_image_as_grid(self, in_tensor, out_tensor, cur_fold, cur_epoch):
         if cur_epoch % self.args.save_img_per_epoch == 0:
@@ -56,7 +61,7 @@ class TrainOnlyCAE(AbsTrainer):
     def _train_epoch(self, cur_fold, cur_epoch, num_folds, model, optimizer, dataset, mode, es=None):
         # train for a single epoch
         total_loss, total_images, images, output = \
-            self.train_epoch_cae(cur_epoch, model, optimizer, dataset, mode, self.args, self.device)
+            self.train_epoch_cae(model, optimizer, dataset, mode, self.args, self.device)
         # store results
         if mode == glb.cv_valid:
             # logging statistics
