@@ -50,7 +50,7 @@ class AbsTrainer:
             model = self.__get_model().to(self.device)
             optimizer = model.get_optimizer()
             # define early stopping
-            es = EarlyStopping(min_delta=0.00001, improve_range=5, score_type="loss")
+            es = EarlyStopping(min_delta=0.00001, improve_range=5, score_type="acc")
             self.__logging_materials_one_time(i, {"MODEL": model, "OPTIMIZER": optimizer, "EARLY STOPPING": es})
 
             for j in range(self.args.num_epoch):
