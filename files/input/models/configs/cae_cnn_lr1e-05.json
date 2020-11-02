@@ -1,7 +1,7 @@
 {
   "use_cnn": true,
   "use_cae": true,
-  "only_train_cae_until": 5,
+  "only_train_cae_until": 20,
   "cnn": {
     "input_resolution": 16,
     "block_sizes": [[32, 64], [64, 128]],
