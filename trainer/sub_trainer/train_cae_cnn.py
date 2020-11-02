@@ -75,4 +75,4 @@ class TrainCAECNN(AbsTrainer):
                 mean_loss_cae = total_loss_cae / len(preds)
                 self.stat_collector.logging_stat_cae(mode, cur_epoch, cur_fold, mean_loss_cae)
                 # record score for early stopping
-                es.set_stop_flg(stats["accuracy"])
+                es.set_stop_flg(acc=stats["accuracy"])
