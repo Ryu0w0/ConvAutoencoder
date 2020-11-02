@@ -16,7 +16,7 @@ class TrainOnlyCAE(AbsTrainer):
 
     @staticmethod
     def _get_early_stopping():
-        return EarlyStopping(min_delta=0.00001, improve_range=5, score_type="loss")
+        return EarlyStopping(min_delta=0.0001, improve_range=5, score_type="loss")
 
     def __save_image_as_grid(self, in_tensor, out_tensor, cur_fold, cur_epoch):
         if cur_epoch % self.args.save_img_per_epoch == 0:
