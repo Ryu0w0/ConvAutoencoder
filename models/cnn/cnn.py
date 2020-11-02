@@ -15,7 +15,10 @@ class CNN(nn.Module):
         # feature extractor
         for from_, to_ in self.config["block_sizes"]:
             if from_ == to_:
-                components.append(nn.Conv2d(in_channels=from_, out_channels=to_, kernel_size=3, stride=1, padding=1))
+                components.extend([
+                    nn.Conv2d(in_channels=from_, out_channels=to_, kernel_size=3, stride=1, padding=1),
+                    nn.LeakyReLU(0.2)
+                ])
             else:
                 components.extend([
                     nn.Conv2d(in_channels=from_, out_channels=to_, kernel_size=3, stride=1, padding=1),
