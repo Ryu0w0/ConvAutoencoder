@@ -8,30 +8,22 @@ class Classifier(nn.Module):
     def __init__(self, config):
         super().__init__()
         self.config = config
-        self.cae = ConvolutionalAutoEncoder(config).double() if self.config["use_cae"] else None
-        self.cnn = CNN(config).double() if self.config["use_cnn"] else None
+        self.cae = ConvolutionalAutoEncoder(config).double()
+        self.cnn = CNN(config).double()
+
+    def is_cnn_attached(self, cur_epoch):
+        if cur_epoch < self.config["cnn"]["train_cnn_from"]:
+            return False
+        else:
+            return True
 
     def get_optimizer(self):
-        # create optimizer for autoencoder and cnn respectively as needed
-        if self.config["use_cae"] and self.config["use_cnn"]:
-            return MultipleOptimizer(opt_cae=self.cae.get_optimizer(), opt_cnn=self.cnn.get_optimizer())
-        elif self.config["use_cnn"]:
-            return self.cnn.get_optimizer()
-        elif self.config["use_cae"]:
-            return self.cae.get_optimizer()
-        else:
-            assert False, "At least one model should be specified."
+        return MultipleOptimizer(opt_cae=self.cae.get_optimizer(), opt_cnn=self.cnn.get_optimizer())
 
-    def forward(self, x):
-        if self.config["use_cae"] and self.config["use_cnn"]:
-            x_hidden, x_auto_en = self.cae(x)
+    def forward(self, x, cur_epoch=None):
+        x_hidden, x_auto_en = self.cae(x)
+        if self.is_cnn_attached(cur_epoch):
             x_cnn = self.cnn(x_hidden)
             return x_auto_en, x_cnn
-        elif self.config["use_cnn"]:
-            x = self.cnn(x)
-            return x
-        elif self.config["use_cae"]:
-            _, x_auto_en = self.cae(x)
-            return x_auto_en
         else:
-            assert False, "At least one model should be specified."
+            return x_auto_en

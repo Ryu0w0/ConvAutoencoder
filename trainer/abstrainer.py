@@ -5,6 +5,8 @@ from utils.logger import logger_, writer_
 from utils import global_var as glb
 from utils.early_stop import EarlyStopping
 from models.classifier import Classifier
+from models.augoencoder.conv_auto_en import ConvolutionalAutoEncoder
+from models.cnn.cnn import CNN
 
 
 class AbsTrainer:
@@ -14,6 +16,16 @@ class AbsTrainer:
         self.args = args
         self.config = config
         self.device = device
+
+    def __get_model(self):
+        if self.config["use_cae"] and self.config["use_cnn"]:
+            return Classifier(self.config)
+        elif self.config["use_cnn"]:
+            return CNN(self.config).double()
+        elif self.config["use_cae"]:
+            return ConvolutionalAutoEncoder(self.config).double()
+        else:
+            assert False, "At least one model should be specified."
 
     @staticmethod
     def __logging_materials_one_time(fold_seq, target_map):
@@ -35,7 +47,7 @@ class AbsTrainer:
             # get valid dataset consisting of 1 fold
             valid = self.cv_dataset.get_valid_dataset(i)
             # construct model and optimizer
-            model = Classifier(self.config).to(self.device)
+            model = self.__get_model().to(self.device)
             optimizer = model.get_optimizer()
             # define early stopping
             es = EarlyStopping(min_delta=0.0001, improve_range=5, score_type="loss")

@@ -17,7 +17,7 @@ def initialization():
     parser.add_argument("-is_reproducible", type=int, default=1)
     parser.add_argument("-is_local", type=int, default=1)
     # MODEL
-    parser.add_argument("-model_config_key", type=str, default="cae_lr1e-05",
+    parser.add_argument("-model_config_key", type=str, default="cnn_lr1e-05",
                         help="Name of config file specifying a model architecture.")
     # TRAINING
     parser.add_argument("-use_aug", type=int, default=1, help="1 if augment train data otherwise 0")
