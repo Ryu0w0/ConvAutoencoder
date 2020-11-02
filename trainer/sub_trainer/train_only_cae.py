@@ -41,7 +41,7 @@ class TrainOnlyCAE(AbsTrainer):
         for id, batch in enumerate(loader):
             images, _ = batch
             images = images.to(device)
-            output = model(images)
+            _, output = model(images)
             loss = F.mse_loss(images, output)
             if mode == glb.cv_train:
                 optimizer.zero_grad()
@@ -54,7 +54,10 @@ class TrainOnlyCAE(AbsTrainer):
         return total_loss, total_images, images, output
 
     def _train_epoch(self, cur_fold, cur_epoch, num_folds, model, optimizer, dataset, mode, es=None):
-        total_loss, total_images, images, output = self.train_epoch_cae(model, optimizer, dataset, mode, self.args, self.device)
+        # train for a single epoch
+        total_loss, total_images, images, output = \
+            self.train_epoch_cae(cur_epoch, model, optimizer, dataset, mode, self.args, self.device)
+        # store results
         if mode == glb.cv_valid:
             # logging statistics
             mean_loss = total_loss / total_images
@@ -63,35 +66,3 @@ class TrainOnlyCAE(AbsTrainer):
             # record score for early stopping
             es.set_stop_flg(mean_loss)
 
-    # def _train_epoch(self, cur_fold, cur_epoch, num_folds, model, optimizer, dataset, mode, es=None):
-    #     loader = DataLoader(dataset, batch_size=self.args.batch_size, shuffle=True)
-    #     total_loss = 0
-    #     total_images = 0
-    #
-    #     if mode == glb.cv_train:
-    #         model.train()
-    #     else:
-    #         model.eval()
-    #
-    #     # training iteration
-    #     for id, batch in enumerate(loader):
-    #         images, _ = batch
-    #         images = images.to(self.device)
-    #         output = model(images)
-    #         loss = F.mse_loss(images, output)
-    #         if mode == glb.cv_train:
-    #             optimizer.zero_grad()
-    #             loss.backward()
-    #             optimizer.step()
-    #
-    #         # collect statistics
-    #         total_images += len(images)
-    #         total_loss += loss.detach().cpu().item()
-    #
-    #     if mode == glb.cv_valid:
-    #         # logging statistics
-    #         mean_loss = total_loss / total_images
-    #         self.stat_collector.logging_stat_cae(mode=mode, cur_fold=cur_fold, cur_epoch=cur_epoch, mean_loss=mean_loss)
-    #         self.__save_image_as_grid(in_tensor=images, out_tensor=output, cur_fold=cur_fold, cur_epoch=cur_epoch)
-    #         # record score for early stopping
-    #         es.set_stop_flg(mean_loss)

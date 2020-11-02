@@ -4,6 +4,7 @@ import torch.nn.functional as F
 from utils import global_var as glb
 from torch.utils.data.dataloader import DataLoader
 from trainer.abstrainer import AbsTrainer
+from trainer.sub_trainer.train_only_cae import TrainOnlyCAE
 from trainer.stat_collector import StatCollector
 
 
@@ -12,19 +13,15 @@ class TrainCAECNN(AbsTrainer):
         super().__init__(cv_dataset, test_dataset, args, config, device)
         self.stat_collector = StatCollector(self.cv_dataset.classes, args)
 
-    @staticmethod
-    def calc_alpha(cur_epoch):
-        no_cnn_loss_until = 10
-        if cur_epoch <= no_cnn_loss_until:
-            return 0
+    def is_only_train_cae(self, cur_epoch):
+        if cur_epoch <= self.config["only_train_cae_until"]:
+            return True
         else:
-            cur_epoch -= cur_epoch
-            denominator = 30
-            numerator = np.min(denominator, cur_epoch)
-            return numerator / denominator
+            return False
 
-    def _train_epoch(self, cur_fold, cur_epoch, num_folds, model, optimizer, dataset, mode, es=None):
-        loader = DataLoader(dataset, batch_size=self.args.batch_size, shuffle=True)
+    @staticmethod
+    def __train_epoch_cae_cnn(model, optimizer, dataset, mode, args, device):
+        loader = DataLoader(dataset, batch_size=args.batch_size, shuffle=True)
         total_loss_cnn = 0
         total_loss_cae = 0
         preds = []
@@ -37,32 +34,46 @@ class TrainCAECNN(AbsTrainer):
         # training iteration
         for id, batch in enumerate(loader):
             images, labels = batch
-            images, labels = images.to(self.device), labels.long().to(self.device)
+            images, labels = images.to(device), labels.long().to(device)
             op_cae, op_cnn = model(images)
 
             # loss
             loss_cae = F.mse_loss(images, op_cae)
             op_cnn = F.log_softmax(op_cnn, dim=1)
             loss_cnn = F.nll_loss(op_cnn, labels)
-            loss_cnn = self.calc_alpha(cur_epoch) * loss_cnn
+            loss = loss_cae + loss_cnn
+
             if mode == glb.cv_train:
                 optimizer.zero_grad()
-                loss_cnn.backward()
-                optimizer.opt_cae.step()
-                optimizer.opt_cnn.step()
+                loss.backward()
+                optimizer.step()
 
             # collect statistics
             total_loss_cnn += loss_cnn.detach().cpu().item()
-            total_loss_cae += loss_cae.detach().cpu().item()
             _, predicted = torch.max(op_cnn.detach().cpu(), 1)
             preds.extend(predicted.tolist())
             gt_labels.extend(labels.detach().cpu().tolist())
+            total_loss_cae += loss_cae.detach().cpu().item()
+        return total_loss_cae, total_loss_cnn, preds, gt_labels
 
-        if mode == glb.cv_valid:
-            # logging statistics
-            mean_loss_cnn, stats = self.stat_collector.calc_stat_cnn(total_loss_cnn, np.array(preds), np.array(gt_labels))
-            self.stat_collector.logging_stat_cnn(mode, cur_epoch, cur_fold, stats, mean_loss_cnn)
-            mean_loss_cae = total_loss_cae / len(preds)
-            self.stat_collector.logging_stat_cae(mode, cur_epoch, cur_fold, mean_loss_cae)
-            # record score for early stopping
-            es.set_stop_flg(mean_loss_cnn, stats["accuracy"])
+    def _train_epoch(self, cur_fold, cur_epoch, num_folds, model, optimizer, dataset, mode, es=None):
+        if self.is_only_train_cae(cur_epoch):
+            total_loss, total_images, images, output = \
+                TrainOnlyCAE.train_epoch_cae(model.cae, optimizer.opt_cae, dataset, mode, self.args, self.device)
+            if mode == glb.cv_valid:
+                # logging statistics
+                mean_loss = total_loss / total_images
+                self.stat_collector.logging_stat_cae(mode=mode, cur_fold=cur_fold, cur_epoch=cur_epoch,
+                                                     mean_loss=mean_loss)
+        else:
+            total_loss_cae, total_loss_cnn, preds, gt_labels = \
+                self.__train_epoch_cae_cnn(model, optimizer, dataset, mode, self.args, self.device)
+            if mode == glb.cv_valid:
+                # logging statistics
+                mean_loss_cnn, stats = self.stat_collector.calc_stat_cnn(total_loss_cnn, np.array(preds), np.array(gt_labels))
+                self.stat_collector.logging_stat_cnn(mode, cur_epoch, cur_fold, stats, mean_loss_cnn)
+                es.set_stop_flg(mean_loss_cnn, stats["accuracy"])
+                mean_loss_cae = total_loss_cae / len(preds)
+                self.stat_collector.logging_stat_cae(mode, cur_epoch, cur_fold, mean_loss_cae)
+                # record score for early stopping
+                es.set_stop_flg(stats["accuracy"])

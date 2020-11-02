@@ -10,7 +10,6 @@ class MultipleOptimizer(object):
         self.opt_cae.zero_grad()
         self.opt_cnn.zero_grad()
 
-    # def step(self, cur_epoch):
-    #     self.opt_cae.step()
-    #     if self.train_cnn_from >= cur_epoch:
-    #         self.opt_cnn.step()
+    def step(self):
+        self.opt_cae.step()
+        self.opt_cnn.step()

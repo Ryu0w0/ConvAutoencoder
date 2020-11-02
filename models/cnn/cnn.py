@@ -1,5 +1,4 @@
 from torch import nn, optim
-from utils.logger import logger_
 from utils.seed import seed_everything
 
 

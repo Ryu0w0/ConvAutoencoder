@@ -28,9 +28,6 @@ class ConvolutionalAutoEncoder(nn.Module):
             nn.LeakyReLU(0.2)
         )
 
-    def visualize_images(self, img_tensor):
-        pass
-
     def get_optimizer(self):
         lr = self.config["opt"]["lr"]
         beta1, beta2 = self.config["opt"]["betas"]
