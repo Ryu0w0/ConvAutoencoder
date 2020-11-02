@@ -72,7 +72,6 @@ class TrainCAECNN(AbsTrainer):
                 # logging statistics
                 mean_loss_cnn, stats = self.stat_collector.calc_stat_cnn(total_loss_cnn, np.array(preds), np.array(gt_labels))
                 self.stat_collector.logging_stat_cnn(mode, cur_epoch, cur_fold, stats, mean_loss_cnn)
-                es.set_stop_flg(mean_loss_cnn, stats["accuracy"])
                 mean_loss_cae = total_loss_cae / len(preds)
                 self.stat_collector.logging_stat_cae(mode, cur_epoch, cur_fold, mean_loss_cae)
                 # record score for early stopping
