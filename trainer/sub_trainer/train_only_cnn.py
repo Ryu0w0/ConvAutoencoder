@@ -2,6 +2,8 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 from utils import global_var as glb
+from utils.seed import seed_everything
+from utils.early_stop import EarlyStopping
 from torch.utils.data.dataloader import DataLoader
 from trainer.abstrainer import AbsTrainer
 from trainer.stat_collector import StatCollector
@@ -12,7 +14,12 @@ class TrainOnlyCNN(AbsTrainer):
         super().__init__(cv_dataset, test_dataset, args, config, device)
         self.stat_collector = StatCollector(self.cv_dataset.classes, args)
 
+    @staticmethod
+    def _get_early_stopping():
+        return EarlyStopping(min_delta=0.0001, improve_range=5, score_type="acc")
+
     def _train_epoch(self, cur_fold, cur_epoch, num_folds, model, optimizer, dataset, mode, es=None):
+        seed_everything()
         loader = DataLoader(dataset, batch_size=self.args.batch_size, shuffle=True)
         total_loss = 0
         preds = []

@@ -17,7 +17,7 @@ def initialization():
     parser.add_argument("-is_reproducible", type=int, default=1)
     parser.add_argument("-is_local", type=int, default=1)
     # MODEL
-    parser.add_argument("-model_config_key", type=str, default="cae_lr1e-05",
+    parser.add_argument("-model_config_key", type=str, default="cnn_lr1e-05",
                         help="Name of config file specifying a model architecture.")
     # TRAINING
     parser.add_argument("-use_aug", type=int, default=1, help="1 if augment train data otherwise 0")
@@ -69,10 +69,8 @@ def main():
     logger_.info(f"Device is {device}")
 
     logger_.info("*** CREATE DATASET ***")
-    # regulation_map = {"all": 2500}
-    regulation_map = {"bird": 2500, "truck": 2500, "deer": 2500}
     trainset = CIFAR10(root='./files/input/dataset', train=True, download=True, args=args,
-                       reg_map=regulation_map)
+                       reg_map=config["train_data_regulation"])
     testset = CIFAR10(root='./files/input/dataset', train=False, download=True, args=args)
 
     logger_.info("*** PREPARE TRAINING ***")

@@ -19,7 +19,7 @@ is_local="-is_local 0"
 # MODEL
 model_config_key="-model_config_key $2"
 # TRAINING
-use_aug="-use_aug 1"
+use_aug="-use_aug 0"
 num_folds="-num_folds 5"
 num_epoch="-num_epoch 100"
 batch_size="-batch_size 64"

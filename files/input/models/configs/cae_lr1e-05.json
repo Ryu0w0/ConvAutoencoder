@@ -2,6 +2,7 @@
   "use_cnn": false,
   "use_cae": true,
   "only_train_cae_until": -1,
+  "train_data_regulation": {"bird": 2500, "truck": 2500, "deer": 2500},
   "cnn": {},
   "cae": {
     "enc_block_sizes": [[3, 6]],
