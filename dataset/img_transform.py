@@ -19,7 +19,9 @@ class ImgTransform:
         """
         if is_train and args.use_aug == 1:
             transform = A.Compose([
+                trans.HorizontalFlip(p=0.5),
                 trans.ShiftScaleRotate(shift_limit=0, scale_limit=0.25, rotate_limit=30, p=1),
+                # trans.CoarseDropout(max_holes=1, min_holes=1, max_height=6, max_width=6),
                 ToTensorV2()]
             )
         else:
