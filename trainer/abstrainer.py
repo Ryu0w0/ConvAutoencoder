@@ -21,9 +21,9 @@ class AbsTrainer:
         if self.config["use_cae"] and self.config["use_cnn"]:
             return Classifier(self.config)
         elif self.config["use_cnn"]:
-            return CNN(self.config).double()
+            return CNN(self.config)
         elif self.config["use_cae"]:
-            return ConvolutionalAutoEncoder(self.config).double()
+            return ConvolutionalAutoEncoder(self.config)
         else:
             assert False, "At least one model should be specified."
 

@@ -14,7 +14,7 @@ module load $1
 save_key="-save_key $3"
 log_level="-log_level INFO"
 use_gpu="-use_gpu 1"
-is_reproducible="-is_reproducible 1"
+is_reproducible="-is_reproducible 0"
 is_local="-is_local 0"
 # MODEL
 model_config_key="-model_config_key $2"

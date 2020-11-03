@@ -59,6 +59,7 @@ class CIFAR10(org_cifar10):
             idx_array = np.where(class_no == np.array(self.targets))[0]
             if self.args.is_local == 1:
                 # regulate data of each class into 250 if running pgm at local while development
+                seed_everything(target="random")
                 idx_array = np.random.choice(idx_array, 250, replace=False)
             elif "all" in reg_map.keys():
                 seed_everything(target="random", local_seed=idx)
