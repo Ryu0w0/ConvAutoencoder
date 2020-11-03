@@ -21,9 +21,11 @@ model_config_key="-model_config_key $2"
 # TRAINING
 use_aug="-use_aug 1"
 num_folds="-num_folds 5"
-num_epoch="-num_epoch 100"
+num_epoch="-num_epoch 200"
 batch_size="-batch_size 64"
 num_workers="-num_workers 1"
 save_img_per_epoch="-save_img_per_epoch 5"
+# TEST
+do_test="-do_test 0"
 
-python3 ./autoencoder_main.py $save_key $log_level $use_gpu $is_reproducible $is_local $model_config_key $use_aug $num_folds $num_epoch $batch_size $num_workers $save_img_per_epoch
+python3 ./autoencoder_main.py $save_key $log_level $use_gpu $is_reproducible $is_local $model_config_key $use_aug $num_folds $num_epoch $batch_size $num_workers $save_img_per_epoch $do_test

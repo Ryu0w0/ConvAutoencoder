@@ -16,7 +16,7 @@ class TrainOnlyCNN(AbsTrainer):
 
     @staticmethod
     def _get_early_stopping():
-        return EarlyStopping(min_delta=0.0001, improve_range=5, score_type="acc")
+        return EarlyStopping(min_delta=0.0001, improve_range=10, score_type="acc")
 
     def _train_epoch(self, cur_fold, cur_epoch, num_folds, model, optimizer, dataset, mode, es=None):
         seed_everything()
