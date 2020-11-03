@@ -27,6 +27,8 @@ def initialization():
     parser.add_argument("-num_workers", type=int, default=1)
     parser.add_argument("-save_img_per_epoch", type=int, default=5,
                         help="Save org and reconstructed images per specified epoch")
+    # TEST
+    parser.add_argument("-do_test", type=int, default=1, help="1 if do testing otherwise 0")
     args = parser.parse_args()
 
     # create logger
