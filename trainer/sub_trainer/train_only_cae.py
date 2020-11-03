@@ -22,7 +22,7 @@ class TrainOnlyCAE(AbsTrainer):
     def __save_image_as_grid(self, in_tensor, out_tensor, cur_fold, cur_epoch):
         if cur_epoch % self.args.save_img_per_epoch == 0:
             for img_tensor, file_name in zip([in_tensor, out_tensor], ["org", "reconstructed"]):
-                img_tensor = self.cv_dataset.transform.denormalize(img_tensor.detach())
+                img_tensor = self.cv_dataset.transform.denormalize(img_tensor.detach().cpu())
                 save_image_path = f"./files/output/images"
                 f_op.create_folder(save_image_path)
                 if img_tensor.shape[0] > 8:
