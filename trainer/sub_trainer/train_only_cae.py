@@ -11,8 +11,8 @@ from trainer.stat_collector import StatCollector
 
 
 class TrainOnlyCAE(AbsTrainer):
-    def __init__(self, cv_dataset, test_dataset, args, config, device):
-        super().__init__(cv_dataset, test_dataset, args, config, device)
+    def __init__(self, cv_dataset, args, config, device):
+        super().__init__(cv_dataset, args, config, device)
         self.stat_collector = StatCollector(self.cv_dataset.classes, args)
 
     @staticmethod
@@ -68,7 +68,7 @@ class TrainOnlyCAE(AbsTrainer):
         if mode == glb.cv_valid:
             # logging statistics
             mean_loss = total_loss / total_images
-            self.stat_collector.logging_stat_cae(mode=mode, cur_fold=cur_fold, cur_epoch=cur_epoch, mean_loss=mean_loss)
+            self.stat_collector.logging_stat_cae(mode=mode, cur_fold=cur_fold, cur_epoch=cur_epoch, mean_loss=mean_loss, num_folds=self.num_folds)
             self.__save_image_as_grid(in_tensor=images, out_tensor=output, cur_fold=cur_fold, cur_epoch=cur_epoch)
             # record score for early stopping
             es.set_stop_flg(mean_loss)

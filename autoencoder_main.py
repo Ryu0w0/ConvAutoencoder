@@ -15,9 +15,9 @@ def initialization():
     parser.add_argument("-log_level", type=str, default="INFO")
     parser.add_argument("-use_gpu", type=int, default=0)
     parser.add_argument("-is_reproducible", type=int, default=1)
-    parser.add_argument("-is_local", type=int, default=1)
+    parser.add_argument("-is_local", type=int, default=0)
     # MODEL
-    parser.add_argument("-model_config_key", type=str, default="cnn_lr1e-05",
+    parser.add_argument("-model_config_key", type=str, default="cnn_lr1e-05_oversampled",
                         help="Name of config file specifying a model architecture.")
     # TRAINING
     parser.add_argument("-use_aug", type=int, default=1, help="1 if augment train data otherwise 0")
@@ -61,7 +61,8 @@ def initialization():
 def main():
     args, config = initialization()
     from utils.logger import logger_
-    from dataset.cifar10 import CIFAR10
+    from dataset.sub_cifar10.cifar10_cv import CIFAR10CV
+    from dataset.sub_cifar10.cifar10_test import CIFAR10Test
     from trainer.sub_trainer.train_cae_cnn import TrainCAECNN
     from trainer.sub_trainer.train_only_cnn import TrainOnlyCNN
     from trainer.sub_trainer.train_only_cae import TrainOnlyCAE
@@ -71,22 +72,28 @@ def main():
     logger_.info(f"Device is {device}")
 
     logger_.info("*** CREATE DATASET ***")
-    trainset = CIFAR10(root='./files/input/dataset', train=True, download=True, args=args,
-                       reg_map=config["train_data_regulation"],
-                       expand_map=config["train_data_expansion"])
-    testset = CIFAR10(root='./files/input/dataset', train=False, download=True, args=args)
+    trainset = CIFAR10CV(root='./files/input/dataset', train=True, download=True, args=args,
+                         reg_map=config["train_data_regulation"],
+                         expand_map=config["train_data_expansion"])
+    testset = CIFAR10Test(root='./files/input/dataset', train=False, download=True, args=args, cifar10_cv=trainset)
 
     logger_.info("*** PREPARE TRAINING ***")
     if config["use_cae"] and config["use_cnn"]:
-        trainer = TrainCAECNN(trainset, testset, args, config, device)
+        trainer_cv = TrainCAECNN(trainset, args, config, device)
+        trainer_test = TrainCAECNN(testset, args, config, device)
     elif config["use_cnn"]:
-        trainer = TrainOnlyCNN(trainset, testset, args, config, device)
+        trainer_cv = TrainOnlyCNN(trainset, args, config, device)
+        trainer_test = TrainOnlyCNN(testset, args, config, device)
     elif config["use_cae"]:
-        trainer = TrainOnlyCAE(trainset, testset, args, config, device)
+        trainer_cv = TrainOnlyCAE(trainset, args, config, device)
+        trainer_test = TrainOnlyCAE(testset, args, config, device)
     else:
         assert False, "At least one model should be specified."
     logger_.info("*** CROSS-VALIDATION ***")
-    trainer.cross_validation()
+    # trainer_cv.cross_validation()
+    if args.do_test:
+        logger_.info("*** TEST ***")
+        trainer_test.cross_validation()
 
     exit(0)
 

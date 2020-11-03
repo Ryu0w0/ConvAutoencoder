@@ -10,8 +10,8 @@ from trainer.stat_collector import StatCollector
 
 
 class TrainOnlyCNN(AbsTrainer):
-    def __init__(self, cv_dataset, test_dataset, args, config, device):
-        super().__init__(cv_dataset, test_dataset, args, config, device)
+    def __init__(self, cv_dataset, args, config, device):
+        super().__init__(cv_dataset, args, config, device)
         self.stat_collector = StatCollector(self.cv_dataset.classes, args)
 
     @staticmethod
@@ -51,6 +51,6 @@ class TrainOnlyCNN(AbsTrainer):
             # logging statistics
             mean_loss, stats = self.stat_collector.calc_stat_cnn(total_loss, np.array(preds), np.array(gt_labels))
             self.stat_collector.logging_stat_cnn(mode=mode, cur_fold=cur_fold, cur_epoch=cur_epoch,
-                                                 mean_loss=mean_loss, stats=stats)
+                                                 mean_loss=mean_loss, stats=stats, num_folds=self.num_folds)
             # record score for early stopping
             es.set_stop_flg(mean_loss, stats["accuracy"])
