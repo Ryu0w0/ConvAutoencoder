@@ -15,7 +15,8 @@ class CIFAR10(org_cifar10):
             self.__regulate_data_num(reg_map)
         self.__show_data_composition()
         self.train_idx_list, self.valid_idx_list = self.__get_idx_folds()
-        self.__expand_data_num(expand_map)
+        if expand_map is not None:
+            self.__expand_data_num(expand_map)
         self.__show_data_composition_cv()
 
     def set_train_transform(self):
