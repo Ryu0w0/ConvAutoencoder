@@ -8,13 +8,15 @@ from dataset.img_transform import ImgTransform
 
 
 class CIFAR10(org_cifar10):
-    def __init__(self, root, train, download, args, reg_map=None):
+    def __init__(self, root, train, download, args, reg_map=None, expand_map=None):
         super().__init__(root=root, train=train, download=download)
         self.args = args
         if reg_map is not None:
             self.__regulate_data_num(reg_map)
         self.__show_data_composition()
         self.train_idx_list, self.valid_idx_list = self.__get_idx_folds()
+        self.__expand_data_num(expand_map)
+        self.__show_data_composition_cv()
 
     def set_train_transform(self):
         """ Set transform into dataset. Call it every epoch of training"""
@@ -48,6 +50,21 @@ class CIFAR10(org_cifar10):
 
         return train_idx_list, valid_idx_list
 
+    def __expand_data_num(self, expand_map):
+        for class_nm, additional_num in expand_map.items():
+            class_idx = self.class_to_idx[class_nm]
+            for i in range(len(self.train_idx_list)):
+                # indices of train data of 4-folds
+                train_indices = self.train_idx_list[i]
+                # labels of train data
+                train_labels = np.array(self.targets)[train_indices]
+                # indices of the class in train data
+                class_indices = train_indices[np.where(train_labels == class_idx)[0]]
+                # oversample the specified number of indices
+                oversampled_indices = np.random.choice(class_indices, additional_num, replace=False)
+                # add oversampled indices
+                self.train_idx_list[i] = np.concatenate([train_indices, oversampled_indices])
+
     def __regulate_data_num(self, reg_map):
         """
         Regulate the number of images.
@@ -80,3 +97,13 @@ class CIFAR10(org_cifar10):
         # show specific info
         for class_nm, class_no in self.class_to_idx.items():
             logger_.info(f"{class_nm}: {len(np.where(class_no == np.array(self.targets))[0])}")
+
+    def __show_data_composition_cv(self):
+        logger_.info(f"*** DATA COMPOSITION in Cross-Validation ***")
+        for i in range(len(self.train_idx_list)):
+            res = {}
+            for cls_nm, cls_idx in self.class_to_idx.items():
+                cnt = np.count_nonzero(np.array(self.targets)[self.train_idx_list[i]] == cls_idx)
+                res[cls_nm] = cnt
+            logger_.info(f"[{i+1}] {res}")
+

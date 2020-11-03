@@ -70,7 +70,8 @@ def main():
 
     logger_.info("*** CREATE DATASET ***")
     trainset = CIFAR10(root='./files/input/dataset', train=True, download=True, args=args,
-                       reg_map=config["train_data_regulation"])
+                       reg_map=config["train_data_regulation"],
+                       expand_map=config["train_data_expansion"])
     testset = CIFAR10(root='./files/input/dataset', train=False, download=True, args=args)
 
     logger_.info("*** PREPARE TRAINING ***")
