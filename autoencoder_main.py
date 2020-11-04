@@ -89,8 +89,10 @@ def main():
         trainer_test = TrainOnlyCAE(testset, args, config, device)
     else:
         assert False, "At least one model should be specified."
-    logger_.info("*** CROSS-VALIDATION ***")
-    # trainer_cv.cross_validation()
+        
+    if args.do_cv:
+        logger_.info("*** CROSS-VALIDATION ***")
+        trainer_cv.cross_validation()
     if args.do_test:
         logger_.info("*** TEST ***")
         trainer_test.cross_validation()
