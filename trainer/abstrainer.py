@@ -2,7 +2,6 @@ import torch
 from utils.logger import logger_
 from utils import global_var as glb
 from dataset.sub_cifar10.cifar10_cv import CIFAR10CV
-from dataset.sub_cifar10.cifar10_test import CIFAR10Test
 from models.classifier import Classifier
 from models.augoencoder.conv_auto_en import ConvolutionalAutoEncoder
 from models.cnn.cnn import CNN
@@ -41,6 +40,7 @@ class AbsTrainer:
         pass
 
     def cross_validation(self):
+        """ Performing training and validation. It can be used for cross-validation and testing """
         for i in range(self.num_folds):
             # setup for one pattern of the n-fold cross-validation
             logger_.info(f"** [{i + 1}/{self.num_folds}] {i + 1}-th CROSS-VALIDATION **")
@@ -83,6 +83,3 @@ class AbsTrainer:
                     logger_.info("EARLY STOP INFO")
                     logger_.info(es)
                     break
-
-    def test(self, mode):
-        pass

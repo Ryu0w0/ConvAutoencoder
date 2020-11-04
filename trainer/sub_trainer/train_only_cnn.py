@@ -10,6 +10,9 @@ from trainer.stat_collector import StatCollector
 
 
 class TrainOnlyCNN(AbsTrainer):
+    """
+    Training CNN for a single epoch.
+    """
     def __init__(self, cv_dataset, args, config, device):
         super().__init__(cv_dataset, args, config, device)
         self.stat_collector = StatCollector(self.cv_dataset.classes, args)
@@ -19,6 +22,14 @@ class TrainOnlyCNN(AbsTrainer):
         return EarlyStopping(min_delta=0.0001, improve_range=10, score_type="acc")
 
     def _train_epoch(self, cur_fold, cur_epoch, num_folds, model, optimizer, dataset, mode, es=None):
+        """
+        Train CNN for a single epoch.
+
+        model: instance of CNN
+        dataset: instance of sub-class of AbstractCIFAR10
+        mode: glb.cv_train or glb.cv_valid
+        es: instance of EarlyStopping
+        """
         seed_everything()
         loader = DataLoader(dataset, batch_size=self.args.batch_size, shuffle=True)
         total_loss = 0

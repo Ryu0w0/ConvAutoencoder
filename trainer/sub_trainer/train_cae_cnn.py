@@ -10,11 +10,19 @@ from trainer.stat_collector import StatCollector
 
 
 class TrainCAECNN(AbsTrainer):
+    """
+    Concurrently training CAE and CNN.
+    cv_dataset: instance of sub-class of AbstractCIFAR10
+    """
     def __init__(self, cv_dataset, args, config, device):
         super().__init__(cv_dataset, args, config, device)
         self.stat_collector = StatCollector(self.cv_dataset.classes, args)
 
     def is_only_train_cae(self, cur_epoch):
+        """
+        Only CAE is trained in the first X epoch.
+        This function judges whether only CAE should be trained in the current epoch or not.
+        """
         if cur_epoch <= self.config["only_train_cae_until"]:
             return True
         else:
@@ -22,6 +30,10 @@ class TrainCAECNN(AbsTrainer):
 
     @staticmethod
     def __train_epoch_cae_cnn(model, optimizer, dataset, mode, args, device):
+        """
+        Train CAE and CNN for a single epoch.
+        model: instance of Classifier
+        """
         seed_everything()
         loader = DataLoader(dataset, batch_size=args.batch_size, shuffle=True)
         total_loss_cnn = 0

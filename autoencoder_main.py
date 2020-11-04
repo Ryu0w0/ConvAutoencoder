@@ -1,3 +1,10 @@
+"""
+This script solely train Convolutional Autoencoder or CNN, or jointly train them according to
+the setting specified in ./files/input/models/configs/*.json
+The location of the Json file is specified in the argument of model_config_key
+"""
+
+
 def initialization():
     """
     Initializing arguments, logger, tensorboard recorder and json files.
@@ -19,7 +26,7 @@ def initialization():
     parser.add_argument("-do_cv", type=int, default=1, help="1 if do cross-validation otherwise 0")
     parser.add_argument("-do_test", type=int, default=1, help="1 if do testing otherwise 0")
     # MODEL
-    parser.add_argument("-model_config_key", type=str, default="cnn_lr1e-05_oversampled",
+    parser.add_argument("-model_config_key", type=str, default="cnn_lr1e-05",
                         help="Name of config file specifying a model architecture.")
     # TRAINING
     parser.add_argument("-use_aug", type=int, default=1, help="1 if augment train data otherwise 0")
@@ -77,19 +84,23 @@ def main():
                          expand_map=config["train_data_expansion"] if "train_data_expansion" in config.keys() else None)
     testset = CIFAR10Test(root='./files/input/dataset', train=False, download=True, args=args, cifar10_cv=trainset)
 
-    logger_.info("*** PREPARE TRAINING ***")
+    logger_.info("*** DEFINE TRAINER ***")
+    # train both CAE and CNN
     if config["use_cae"] and config["use_cnn"]:
         trainer_cv = TrainCAECNN(trainset, args, config, device)
         trainer_test = TrainCAECNN(testset, args, config, device)
+    # only train CNN
     elif config["use_cnn"]:
         trainer_cv = TrainOnlyCNN(trainset, args, config, device)
         trainer_test = TrainOnlyCNN(testset, args, config, device)
+    # only train CAE
     elif config["use_cae"]:
         trainer_cv = TrainOnlyCAE(trainset, args, config, device)
         trainer_test = TrainOnlyCAE(testset, args, config, device)
     else:
         assert False, "At least one model should be specified."
 
+    # training and validation
     if args.do_cv:
         logger_.info("*** CROSS-VALIDATION ***")
         trainer_cv.cross_validation()

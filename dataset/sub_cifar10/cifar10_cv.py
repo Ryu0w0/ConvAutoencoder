@@ -7,6 +7,17 @@ from utils.seed import seed_everything
 
 class CIFAR10CV(AbstractCIFAR10):
     def __init__(self, root, train, download, args, reg_map, expand_map=None):
+        """
+        Sub-class of AbstractCIFAR10 used for cross-validation.
+        It holds n sets of training and validation data as indices.
+        "n" corresponds to n-fold cross-validation.
+        reg_map: dict
+            It specifies how much the number of data in each class is regulated.
+            e.g. {class_nm: data_num_into, ...}
+        expand_map: dict
+            It specifies how much the number of data is oversampled.
+            e.g. {class_nm: plus_X, ...}
+        """
         super().__init__(root=root, train=train, download=download, args=args)
         if reg_map is not None:
             # overwrite with regulated number of data and labels
@@ -47,6 +58,7 @@ class CIFAR10CV(AbstractCIFAR10):
         return data, targets
 
     def __expand_data_num(self, expand_map):
+        """ Previously oversample specified classes """
         train_idx_list = copy.deepcopy(self.train_idx_list)
         for class_nm, additional_num in expand_map.items():
             class_idx = self.class_to_idx[class_nm]
@@ -68,10 +80,11 @@ class CIFAR10CV(AbstractCIFAR10):
         return train_idx_list
 
     def __get_idx_folds(self):
+        """ Split data into n-patterns of training and validation data in the stratified manner """
         train_idx_list = []
         valid_idx_list = []
         seed_everything(target="random")
-        skf = StratifiedKFold(n_splits=5, shuffle=True)
+        skf = StratifiedKFold(n_splits=self.args.num_folds, shuffle=True)
         for train_idx, valid_idx in skf.split(self.data, self.targets):
             train_idx_list.append(train_idx)
             valid_idx_list.append(valid_idx)

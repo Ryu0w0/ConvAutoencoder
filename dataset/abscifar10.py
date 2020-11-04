@@ -6,7 +6,18 @@ from dataset.img_transform import ImgTransform
 
 
 class AbstractCIFAR10(org_cifar10):
+    """
+    Abstract class of CIFAR10.
+    """
     def __init__(self, root, train, download, args):
+        """
+        root: str
+            location of downloading dataset
+        train: boolean
+            True for cross-validation, False for testing
+        download: boolean
+            True for downloading dataset
+        """
         super().__init__(root=root, train=train, download=download)
         self.args = args
         self.train_idx_list = None

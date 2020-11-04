@@ -17,9 +17,10 @@ class ImgTransform:
         """
         Convert numpy array into Tensor if dataset is for validation.
         Apply data augmentation method to train dataset while cv or test if args.use_aug is 1.
-        :param args: arguments of main.py
-        :param is_train: flg that dataset is for validation in cv or test
-        :return:
+
+        is_train: boolean
+            flg that dataset is for validation in cv or test
+        return: Compose of albumentations
         """
         if is_train and args.use_aug == 1:
             transform = A.Compose([
