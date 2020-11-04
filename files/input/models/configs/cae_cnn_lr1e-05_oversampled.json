@@ -1,0 +1,30 @@
+{
+  "use_cnn": true,
+  "use_cae": true,
+  "train_data_regulation": {"bird": 2500, "truck": 2500, "deer": 2500},
+  "train_data_expansion": {"bird": 2000, "truck": 2000, "deer": 2000},
+  "only_train_cae_until": 50,
+  "cnn": {
+    "use_mixed_input": false,
+    "input_resolution": 16,
+    "block_sizes": [[6, 32, false], [32, 64, true],[64, 128, true]],
+    "opt": {
+      "lr": 1e-05,
+      "betas": [
+        0.0,
+        0.999
+      ]
+    }
+  },
+  "cae": {
+    "enc_block_sizes": [[3, 6]],
+    "dec_block_sizes": [[6, 3]],
+    "opt": {
+      "lr": 1e-05,
+      "betas": [
+        0.0,
+        0.999
+      ]
+    }
+  }
+}

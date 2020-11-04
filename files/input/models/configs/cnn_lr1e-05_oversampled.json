@@ -5,7 +5,7 @@
   "train_data_expansion": {"bird": 2000, "truck": 2000, "deer": 2000},
   "cnn": {
     "input_resolution": 32,
-    "block_sizes": [[3, 32], [32, 64], [64, 128]],
+    "block_sizes": [[3, 32, true], [32, 64, true], [64, 128, true]],
     "opt": {
       "lr": 1e-05,
       "betas": [

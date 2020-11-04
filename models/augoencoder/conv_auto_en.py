@@ -18,8 +18,8 @@ class ConvolutionalAutoEncoder(nn.Module):
         for from_, to_ in self.config["dec_block_sizes"]:
             dec_components.extend([
                 nn.ConvTranspose2d(in_channels=from_, out_channels=to_, kernel_size=4, stride=2, padding=1),
-                nn.BatchNorm2d(num_features=to_),
-                nn.LeakyReLU(0.2)
+                nn.LeakyReLU(0.2),
+                nn.BatchNorm2d(num_features=to_)
             ])
         self.decoder = nn.Sequential(*dec_components)
 

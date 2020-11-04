@@ -9,11 +9,11 @@ class Classifier(nn.Module):
     def __init__(self, config):
         super().__init__()
         self.config = config
-        self.cae = ConvolutionalAutoEncoder(config).double()
+        self.cae = ConvolutionalAutoEncoder(config)
         if config["cnn"]["use_mixed_input"]:
-            self.cnn = MixedCNN(config).double()
+            self.cnn = MixedCNN(config)
         else:
-            self.cnn = CNN(config).double()
+            self.cnn = CNN(config)
 
     def get_optimizer(self):
         return MultipleOptimizer(opt_cae=self.cae.get_optimizer(), opt_cnn=self.cnn.get_optimizer())

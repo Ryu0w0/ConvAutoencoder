@@ -3,6 +3,7 @@ import torch
 import torch.nn.functional as F
 from utils import global_var as glb
 from utils.seed import seed_everything
+from utils.early_stop import EarlyStopping
 from torch.utils.data.dataloader import DataLoader
 from trainer.abstrainer import AbsTrainer
 from trainer.sub_trainer.train_only_cae import TrainOnlyCAE
@@ -17,6 +18,10 @@ class TrainCAECNN(AbsTrainer):
     def __init__(self, cv_dataset, args, config, device):
         super().__init__(cv_dataset, args, config, device)
         self.stat_collector = StatCollector(self.cv_dataset.classes, args)
+
+    @staticmethod
+    def _get_early_stopping():
+        return EarlyStopping(min_delta=0.0001, improve_range=10, score_type="acc")
 
     def is_only_train_cae(self, cur_epoch):
         """

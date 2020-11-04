@@ -26,7 +26,7 @@ def initialization():
     parser.add_argument("-do_cv", type=int, default=1, help="1 if do cross-validation otherwise 0")
     parser.add_argument("-do_test", type=int, default=1, help="1 if do testing otherwise 0")
     # MODEL
-    parser.add_argument("-model_config_key", type=str, default="cnn_lr1e-05",
+    parser.add_argument("-model_config_key", type=str, default="cae_cnn_lr1e-05_oversampled",
                         help="Name of config file specifying a model architecture.")
     # TRAINING
     parser.add_argument("-use_aug", type=int, default=1, help="1 if augment train data otherwise 0")
