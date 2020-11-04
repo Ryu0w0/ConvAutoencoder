@@ -23,7 +23,7 @@ model_config_key="-model_config_key $2"
 # TRAINING
 use_aug="-use_aug 1"
 num_folds="-num_folds 5"
-num_epoch="-num_epoch 200"
+num_epoch="-num_epoch 400"
 batch_size="-batch_size 64"
 num_workers="-num_workers 1"
 save_img_per_epoch="-save_img_per_epoch 5"
