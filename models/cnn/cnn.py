@@ -23,7 +23,7 @@ class CNN(nn.Module):
         components.append(nn.Flatten())
         num_pooling = len([comp for comp in components if isinstance(comp, nn.MaxPool2d)])
         last_resolution = int((input_resolution / (2 ** num_pooling)))
-        last_depth = self.config["block_sizes"][-1][-1]
+        last_depth = self.config["block_sizes"][-1][1]
         components.append(nn.Linear(in_features=last_depth * last_resolution ** 2, out_features=num_class))
         return components
 
