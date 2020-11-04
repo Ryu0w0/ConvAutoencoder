@@ -74,7 +74,7 @@ def main():
     logger_.info("*** CREATE DATASET ***")
     trainset = CIFAR10CV(root='./files/input/dataset', train=True, download=True, args=args,
                          reg_map=config["train_data_regulation"],
-                         expand_map=config["train_data_expansion"])
+                         expand_map=config["train_data_expansion"] if "train_data_expansion" in config.keys() else None)
     testset = CIFAR10Test(root='./files/input/dataset', train=False, download=True, args=args, cifar10_cv=trainset)
 
     logger_.info("*** PREPARE TRAINING ***")
