@@ -16,7 +16,7 @@ log_level="-log_level INFO"
 use_gpu="-use_gpu 1"
 is_reproducible="-is_reproducible 0"
 is_local="-is_local 0"
-do_cv="-cv 0"
+do_cv="-do_cv 0"
 do_test="-do_test 1"
 # MODEL
 model_config_key="-model_config_key $2"

@@ -16,6 +16,8 @@ def initialization():
     parser.add_argument("-use_gpu", type=int, default=0)
     parser.add_argument("-is_reproducible", type=int, default=1)
     parser.add_argument("-is_local", type=int, default=0)
+    parser.add_argument("-do_cv", type=int, default=1, help="1 if do cross-validation otherwise 0")
+    parser.add_argument("-do_test", type=int, default=1, help="1 if do testing otherwise 0")
     # MODEL
     parser.add_argument("-model_config_key", type=str, default="cnn_lr1e-05_oversampled",
                         help="Name of config file specifying a model architecture.")
@@ -27,8 +29,6 @@ def initialization():
     parser.add_argument("-num_workers", type=int, default=1)
     parser.add_argument("-save_img_per_epoch", type=int, default=5,
                         help="Save org and reconstructed images per specified epoch")
-    # TEST
-    parser.add_argument("-do_test", type=int, default=1, help="1 if do testing otherwise 0")
     args = parser.parse_args()
 
     # create logger
@@ -89,7 +89,7 @@ def main():
         trainer_test = TrainOnlyCAE(testset, args, config, device)
     else:
         assert False, "At least one model should be specified."
-        
+
     if args.do_cv:
         logger_.info("*** CROSS-VALIDATION ***")
         trainer_cv.cross_validation()
