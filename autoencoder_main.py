@@ -20,19 +20,20 @@ def initialization():
     parser.add_argument("-save_key", type=str, default="auto_en",
                         help="Used as a file name of dataset and log files")
     parser.add_argument("-log_level", type=str, default="INFO")
-    parser.add_argument("-use_gpu", type=int, default=0)
-    parser.add_argument("-is_reproducible", type=int, default=1)
-    parser.add_argument("-is_local", type=int, default=0)
+    parser.add_argument("-use_gpu", type=int, default=0, help="1 if use GPU otherwise 0")
+    parser.add_argument("-is_reproducible", type=int, default=1, help="1 if feed seeds to all random procedures")
+    parser.add_argument("-is_local", type=int, default=0,
+                        help="1 if reduce training data for running with CPU otherwise 0")
     parser.add_argument("-do_cv", type=int, default=1, help="1 if do cross-validation otherwise 0")
     parser.add_argument("-do_test", type=int, default=1, help="1 if do testing otherwise 0")
     # MODEL
-    parser.add_argument("-model_config_key", type=str, default="cae_cnn_lr1e-05_oversampled",
+    parser.add_argument("-model_config_key", type=str, default="cae_mixedcnn_oversampled",
                         help="Name of config file specifying a model architecture.")
     # TRAINING
-    parser.add_argument("-use_aug", type=int, default=1, help="1 if augment train data otherwise 0")
-    parser.add_argument("-num_folds", type=int, default=5)
+    parser.add_argument("-use_aug", type=int, default=0, help="1 if augment train data otherwise 0")
+    parser.add_argument("-num_folds", type=int, default=5, help="Specify n for n-folds cross-validation")
     parser.add_argument("-num_epoch", type=int, default=10)
-    parser.add_argument("-batch_size", type=int, default=128)
+    parser.add_argument("-batch_size", type=int, default=64)
     parser.add_argument("-num_workers", type=int, default=1)
     parser.add_argument("-save_img_per_epoch", type=int, default=5,
                         help="Save org and reconstructed images per specified epoch")
