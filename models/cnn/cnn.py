@@ -1,34 +1,31 @@
 from torch import nn, optim
-from utils.logger import logger_
 from utils.seed import seed_everything
 
 
 class CNN(nn.Module):
-    def __init__(self, config):
+    def __init__(self, config, num_class=10):
         super().__init__()
         self.config = config["cnn"]
-        self.main = nn.Sequential(
-            # 1st block, output 16x16
-            nn.Conv2d(in_channels=3, out_channels=32, kernel_size=3, stride=1, padding=1),
-            nn.MaxPool2d(kernel_size=2, stride=2),
-            nn.LeakyReLU(0.2),
-            nn.BatchNorm2d(num_features=32),
-            # 2nd block, output 8x8
-            nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, stride=1, padding=1),
-            nn.MaxPool2d(kernel_size=2, stride=2),
-            nn.LeakyReLU(0.2),
-            nn.BatchNorm2d(num_features=64),
-            # 3rd block, output 4x4
-            nn.Conv2d(in_channels=64, out_channels=128, kernel_size=3, stride=1, padding=1),
-            nn.MaxPool2d(kernel_size=2, stride=2),
-            nn.LeakyReLU(0.2),
-            nn.BatchNorm2d(num_features=128),
-            # classifying
-            nn.Flatten(),
-            # nn.Dropout(),
-            nn.Linear(in_features=4*4*128, out_features=10)
-        )
+        self.main = self.main = nn.Sequential(*self.__build_structure(num_class))
         self.__initialize_weight()
+
+    def __build_structure(self, num_class):
+        input_resolution = self.config["input_resolution"]
+        components = []
+        # feature extractor
+        for from_, to_, use_pool in self.config["block_sizes"]:
+            components.append(nn.Conv2d(in_channels=from_, out_channels=to_, kernel_size=3, stride=1, padding=1))
+            if use_pool:
+                components.append(nn.MaxPool2d(kernel_size=2, stride=2))
+            components.append(nn.LeakyReLU(0.2))
+            components.append(nn.BatchNorm2d(num_features=to_))
+        # classifying
+        components.append(nn.Flatten())
+        num_pooling = len([comp for comp in components if isinstance(comp, nn.MaxPool2d)])
+        last_resolution = int((input_resolution / (2 ** num_pooling)))
+        last_depth = self.config["block_sizes"][-1][1]
+        components.append(nn.Linear(in_features=last_depth * last_resolution ** 2, out_features=num_class))
+        return components
 
     def __initialize_weight(self):
         for idx, m in enumerate(self.modules()):

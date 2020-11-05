@@ -11,19 +11,21 @@
 module load $1
 
 # PARAMETERS
-save_key="-save_key $2"
+save_key="-save_key $3"
 log_level="-log_level INFO"
 use_gpu="-use_gpu 1"
-is_reproducible="-is_reproducible 1"
+is_reproducible="-is_reproducible 0"
 is_local="-is_local 0"
+do_cv="-do_cv 0"
+do_test="-do_test 1"
 # MODEL
-model_config_key="-model_config_key cae_lr1e-05"
+model_config_key="-model_config_key $2"
 # TRAINING
-use_aug="-use_aug 0"
+use_aug="-use_aug 1"
 num_folds="-num_folds 5"
-num_epoch="-num_epoch 100"
+num_epoch="-num_epoch 400"
 batch_size="-batch_size 64"
 num_workers="-num_workers 1"
 save_img_per_epoch="-save_img_per_epoch 5"
 
-python3 ./autoencoder_main.py $save_key $log_level $use_gpu $is_reproducible $is_local $model_config_key $use_aug $num_folds $num_epoch $batch_size $num_workers $save_img_per_epoch
+python3 ./autoencoder_main.py $save_key $log_level $use_gpu $is_reproducible $is_local $model_config_key $use_aug $num_folds $num_epoch $batch_size $num_workers $save_img_per_epoch $do_cv $do_test

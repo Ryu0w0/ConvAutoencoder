@@ -1,15 +1,15 @@
 class MultipleOptimizer(object):
-    def __init__(self, *op):
-        self.optimizers = op
+    def __init__(self, opt_cae, opt_cnn):
+        self.opt_cae = opt_cae
+        self.opt_cnn = opt_cnn
 
     def __str__(self):
-        # TODO: 動作確認
-        return [opt.__str__() for opt in self.optimizers]
+        return " ".join([opt.__str__() for opt in [self.opt_cae, self.opt_cnn]])
 
     def zero_grad(self):
-        for op in self.optimizers:
-            op.zero_grad()
+        self.opt_cae.zero_grad()
+        self.opt_cnn.zero_grad()
 
     def step(self):
-        for op in self.optimizers:
-            op.step()
+        self.opt_cae.step()
+        self.opt_cnn.step()

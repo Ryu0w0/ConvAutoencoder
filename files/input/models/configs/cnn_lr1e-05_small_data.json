@@ -1,7 +1,7 @@
 {
   "use_cnn": true,
   "use_cae": false,
-  "train_data_regulation": {"bird": 2500, "truck": 2500, "deer": 2500},
+  "train_data_regulation": {"all": 2500},
   "cnn": {
     "input_resolution": 32,
     "block_sizes": [[3, 32, true], [32, 64, true], [64, 128, true]],

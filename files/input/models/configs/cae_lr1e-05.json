@@ -1,16 +1,11 @@
 {
   "use_cnn": false,
   "use_cae": true,
-  "cnn": {
-    "opt": {
-      "lr": 1e-05,
-      "betas": [
-        0.0,
-        0.999
-      ]
-    }
-  },
+  "train_data_regulation": {"bird": 2500, "truck": 2500, "deer": 2500},
+  "cnn": {},
   "cae": {
+    "enc_block_sizes": [[3, 6]],
+    "dec_block_sizes": [[6, 3]],
     "opt": {
       "lr": 1e-05,
       "betas": [
