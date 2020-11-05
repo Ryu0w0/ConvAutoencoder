@@ -3,6 +3,8 @@ A PyTorch implementation of Convolutional autoencoder (CAE) and CNN on cifar-10.
 
 The default configuration of this repository jointly trains CAE and CNN at the same time. The training scheme is presented below.
 
+<img src="https://github.com/Ryu0w0/meta_repository/blob/master/ConvAutoencoder/images/Structure_CAE_CNN.PNG" width=60%>
+
 ## How to run
 1. Call autoencoder_main.py
 2. Log files and tensorboard files recording acc and loss are produced under the directory of ./files/output
