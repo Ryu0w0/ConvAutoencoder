@@ -1,6 +1,7 @@
 import numpy as np
 import torch
 import torch.nn.functional as F
+from utils.global_var import TrainType
 from utils import global_var as glb
 from utils.seed import seed_everything
 from utils.early_stop import EarlyStopping
@@ -35,7 +36,7 @@ class TrainOnlyCNN(AbsTrainer):
         total_loss = 0
         preds = []
         gt_labels = []
-        if mode == glb.cv_train:
+        if mode == TrainType.CV_TRAIN:
             model.train()
         else:
             model.eval()
@@ -47,7 +48,7 @@ class TrainOnlyCNN(AbsTrainer):
             output = model(images)  # shape: (data_num, class_num)
             output = F.log_softmax(output, dim=1)
             loss = F.nll_loss(output, labels)
-            if mode == glb.cv_train:
+            if mode == TrainType.CV_TRAIN:
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
@@ -58,7 +59,7 @@ class TrainOnlyCNN(AbsTrainer):
             preds.extend(predicted.tolist())
             gt_labels.extend(labels.detach().cpu().tolist())
 
-        if mode == glb.cv_valid:
+        if mode == TrainType.CV_VALID:
             # logging statistics
             mean_loss, stats = self.stat_collector.calc_stat_cnn(total_loss, np.array(preds), np.array(gt_labels))
             self.stat_collector.logging_stat_cnn(mode=mode, cur_fold=cur_fold, cur_epoch=cur_epoch,
