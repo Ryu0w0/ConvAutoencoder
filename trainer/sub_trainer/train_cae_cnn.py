@@ -2,6 +2,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 from utils import global_var as glb
+from utils.global_var import TrainType
 from utils.seed import seed_everything
 from utils.early_stop import EarlyStopping
 from torch.utils.data.dataloader import DataLoader
@@ -45,7 +46,7 @@ class TrainCAECNN(AbsTrainer):
         total_loss_cae = 0
         preds = []
         gt_labels = []
-        if mode == glb.cv_train:
+        if mode == TrainType.CV_TRAIN:
             model.train()
         else:
             model.eval()
@@ -62,7 +63,7 @@ class TrainCAECNN(AbsTrainer):
             loss_cnn = F.nll_loss(op_cnn, labels)
             loss = loss_cae + loss_cnn
 
-            if mode == glb.cv_train:
+            if mode == TrainType.CV_TRAIN:
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
@@ -79,7 +80,7 @@ class TrainCAECNN(AbsTrainer):
         if self.is_only_train_cae(cur_epoch):
             total_loss, total_images, images, output = \
                 TrainOnlyCAE.train_epoch_cae(model.cae, optimizer.opt_cae, dataset, mode, self.args, self.device)
-            if mode == glb.cv_valid:
+            if mode == TrainType.CV_VALID:
                 # logging statistics
                 mean_loss = total_loss / total_images
                 self.stat_collector.logging_stat_cae(mode=mode, cur_fold=cur_fold, cur_epoch=cur_epoch,
@@ -87,7 +88,7 @@ class TrainCAECNN(AbsTrainer):
         else:
             total_loss_cae, total_loss_cnn, preds, gt_labels = \
                 self.__train_epoch_cae_cnn(model, optimizer, dataset, mode, self.args, self.device)
-            if mode == glb.cv_valid:
+            if mode == TrainType.CV_VALID:
                 # logging statistics
                 mean_loss_cnn, stats = self.stat_collector.calc_stat_cnn(total_loss_cnn, np.array(preds), np.array(gt_labels))
                 self.stat_collector.logging_stat_cnn(mode, cur_epoch, cur_fold, stats, mean_loss_cnn, self.num_folds)

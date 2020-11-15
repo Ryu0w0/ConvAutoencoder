@@ -36,7 +36,7 @@ def create_logger(logger_name, log_root_path, save_key, level=logging.INFO):
     return logger
 
 
-def get_log_level_from_name(log_level_name):
+def get_log_level_from_name(log_level_name: str) -> int:
     if log_level_name == "DEBUG":
         return logging.DEBUG
     elif log_level_name == "INFO":

@@ -1,6 +1,7 @@
 import torch
 from utils.logger import logger_
 from utils import global_var as glb
+from utils.global_var import TrainType
 from dataset.sub_cifar10.cifar10_cv import CIFAR10CV
 from models.classifier import Classifier
 from models.augoencoder.conv_auto_en import ConvolutionalAutoEncoder
@@ -36,7 +37,7 @@ class AbsTrainer:
     def _get_early_stopping():
         pass
 
-    def _train_epoch(self, cur_fold, cur_epoch, num_folds, model, optimizer, dataset, mode, es=None):
+    def _train_epoch(self, cur_fold, cur_epoch, num_folds, model, optimizer, dataset, mode: TrainType, es=None):
         pass
 
     def cross_validation(self):
@@ -65,7 +66,7 @@ class AbsTrainer:
                                   model=model,
                                   optimizer=optimizer,
                                   dataset=train,
-                                  mode=glb.cv_train,
+                                  mode=TrainType.CV_TRAIN,
                                   es=es)
                 # validation
                 self.cv_dataset.set_valid_transform()
@@ -76,7 +77,7 @@ class AbsTrainer:
                                       model=model,
                                       optimizer=optimizer,
                                       dataset=valid,
-                                      mode=glb.cv_valid,
+                                      mode=TrainType.CV_VALID,
                                       es=es)
                 if es.is_stop:
                     logger_.info("FINISH TRAINING BY EARLY STOPPING")

@@ -14,40 +14,19 @@ def initialization():
     from utils import file_operator as f_op
     from utils import logger as log_util
     from utils import seed
+    from utils.config import Config
+    import environ
 
-    # parameters
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-save_key", type=str, default="auto_en",
-                        help="Used as a file name of dataset and log files")
-    parser.add_argument("-log_level", type=str, default="INFO")
-    parser.add_argument("-use_gpu", type=int, default=0, help="1 if use GPU otherwise 0")
-    parser.add_argument("-is_reproducible", type=int, default=1, help="1 if feed seeds to all random procedures")
-    parser.add_argument("-is_local", type=int, default=0,
-                        help="1 if reduce training data for running with CPU otherwise 0")
-    parser.add_argument("-do_cv", type=int, default=1, help="1 if do cross-validation otherwise 0")
-    parser.add_argument("-do_test", type=int, default=1, help="1 if do testing otherwise 0")
-    # MODEL
-    parser.add_argument("-model_config_key", type=str, default="cae_mixedcnn_oversampled",
-                        help="Name of config file specifying a model architecture.")
-    # TRAINING
-    parser.add_argument("-use_aug", type=int, default=0, help="1 if augment train data otherwise 0")
-    parser.add_argument("-num_folds", type=int, default=5, help="Specify n for n-folds cross-validation")
-    parser.add_argument("-num_epoch", type=int, default=10)
-    parser.add_argument("-batch_size", type=int, default=64)
-    parser.add_argument("-num_workers", type=int, default=1)
-    parser.add_argument("-save_img_per_epoch", type=int, default=5,
-                        help="Save org and reconstructed images per specified epoch")
-    args = parser.parse_args()
+    # create config object from arguments
+    args = environ.to_config(Config)
 
     # create logger
-    args.log_level = log_util.get_log_level_from_name(args.log_level)
     logger_ = log_util.create_logger("main", "./files/output/logs", args.save_key, args.log_level)
     log_util.logger_ = logger_
 
     # show specified arguments
     logger_.info("*** ARGUMENTS ***")
-    for k, v in args.__dict__.items():
-        logger_.info(f"{k}: {v}")
+    logger_.info(args)
 
     # create TensorBoard writer
     board_root_dir = f"./files/output/board/{args.save_key}"
@@ -60,7 +39,7 @@ def initialization():
     logger_.info(config)
 
     # set flg of using seeds
-    if args.is_reproducible:
+    if args.is_seed:
         seed.feed_seed = True
 
     return args, config

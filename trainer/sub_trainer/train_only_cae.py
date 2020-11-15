@@ -2,6 +2,7 @@ import numpy as np
 import torch.nn.functional as F
 from torch.utils.data.dataloader import DataLoader
 from torchvision import utils as vutils
+from utils.global_var import TrainType
 from utils import global_var as glb
 from utils.early_stop import EarlyStopping
 from utils import file_operator as f_op
@@ -47,7 +48,7 @@ class TrainOnlyCAE(AbsTrainer):
         total_loss = 0
         total_images = 0
 
-        if mode == glb.cv_train:
+        if mode == TrainType.CV_TRAIN:
             model.train()
         else:
             model.eval()
@@ -58,7 +59,7 @@ class TrainOnlyCAE(AbsTrainer):
             images = images.to(device)
             _, output = model(images)
             loss = F.mse_loss(images, output)
-            if mode == glb.cv_train:
+            if mode == TrainType.CV_TRAIN:
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
@@ -81,7 +82,7 @@ class TrainOnlyCAE(AbsTrainer):
         total_loss, total_images, images, output = \
             self.train_epoch_cae(model, optimizer, dataset, mode, self.args, self.device)
         # store results
-        if mode == glb.cv_valid:
+        if mode == TrainType.CV_VALID:
             # logging statistics
             mean_loss = total_loss / total_images
             self.stat_collector.logging_stat_cae(mode=mode, cur_fold=cur_fold, cur_epoch=cur_epoch, mean_loss=mean_loss, num_folds=self.num_folds)

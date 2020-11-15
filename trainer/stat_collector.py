@@ -23,13 +23,13 @@ class StatCollector:
                             global_step=cur_epoch)
 
     # CNN
-    def calc_stat_cnn(self, total_loss, preds, labels):
+    def calc_stat_cnn(self, total_loss: float, preds: np.ndarray, labels: np.ndarray) -> (float, dict):
         """ Calculate loss as well as acc, recall, precision and f1 score stored in stats. """
         mean_loss = total_loss / len(preds)
         stats = metrics.classification_report(labels, preds, target_names=self.class_names, output_dict=True)
         return mean_loss, stats
 
-    def logging_stat_cnn(self, mode, cur_epoch, cur_fold, stats, mean_loss, num_folds):
+    def logging_stat_cnn(self, mode: str, cur_epoch: int, cur_fold: int, stats, mean_loss, num_folds):
         """ Report statistics and record them in tensorboard """
         # logging overall loss and acc
         for stat_nm, stat in zip(["loss", "acc"], [mean_loss, stats["accuracy"]]):

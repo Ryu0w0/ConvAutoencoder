@@ -3,10 +3,13 @@ import numpy as np
 from sklearn.model_selection import StratifiedKFold
 from dataset.abscifar10 import AbstractCIFAR10
 from utils.seed import seed_everything
+from utils.config import Config
+from typing import Optional
 
 
 class CIFAR10CV(AbstractCIFAR10):
-    def __init__(self, root, train, download, args, reg_map, expand_map=None):
+    def __init__(self, root: str, train: bool, download: bool, args: Config,
+                 reg_map: dict, expand_map: Optional[dict] = None):
         """
         Sub-class of AbstractCIFAR10 used for cross-validation.
         It holds n sets of training and validation data as indices.
@@ -32,7 +35,7 @@ class CIFAR10CV(AbstractCIFAR10):
         # show data composition
         self._show_data_composition()
 
-    def __regulate_data_num(self, reg_map):
+    def __regulate_data_num(self, reg_map: dict) -> (np.ndarray, list):
         """
         Regulate the number of images.
         reg_map: dict
