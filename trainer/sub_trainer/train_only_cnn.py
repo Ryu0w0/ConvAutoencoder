@@ -22,7 +22,8 @@ class TrainOnlyCNN(AbsTrainer):
     def _get_early_stopping():
         return EarlyStopping(min_delta=0.0001, improve_range=10, score_type="acc")
 
-    def _train_epoch(self, cur_fold, cur_epoch, num_folds, model, optimizer, dataset, mode, es=None):
+    def _train_epoch(self, cur_fold, cur_epoch, num_folds, model, optimizer,
+                     dataset, mode: TrainType, es=None):
         """
         Train CNN for a single epoch.
 
@@ -62,7 +63,7 @@ class TrainOnlyCNN(AbsTrainer):
         if mode == TrainType.CV_VALID:
             # logging statistics
             mean_loss, stats = self.stat_collector.calc_stat_cnn(total_loss, np.array(preds), np.array(gt_labels))
-            self.stat_collector.logging_stat_cnn(mode=mode, cur_fold=cur_fold, cur_epoch=cur_epoch,
+            self.stat_collector.logging_stat_cnn(mode=mode.value, cur_fold=cur_fold, cur_epoch=cur_epoch,
                                                  mean_loss=mean_loss, stats=stats, num_folds=self.num_folds)
             # record score for early stopping
             es.set_stop_flg(mean_loss, stats["accuracy"])

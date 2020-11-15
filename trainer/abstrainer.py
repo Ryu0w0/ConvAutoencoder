@@ -37,7 +37,7 @@ class AbsTrainer:
     def _get_early_stopping():
         pass
 
-    def _train_epoch(self, cur_fold, cur_epoch, num_folds, model, optimizer, dataset, mode, es=None):
+    def _train_epoch(self, cur_fold, cur_epoch, num_folds, model, optimizer, dataset, mode: TrainType, es=None):
         pass
 
     def cross_validation(self):
